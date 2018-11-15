@@ -1,0 +1,114 @@
+/*
+<metadata description="Random Walk (Integer)">
+    <variables>
+        <variable name="prtColour"  displayName="Particle Colour" type="colour" value="0xFFFF00" />
+        <variable name="isDisco"    displayName="Disco Mode"      type="bool"   value="false"    />
+        <variable name="isPeriodic" displayName="Periodic Boundary Conditions" type="bool" value="true" />
+    </variables>
+</metadata>
+*/
+
+// Position
+int x;
+int y;
+
+// Direction
+int dir;
+
+// State variables
+bool isRunning;         // is simulation running
+bool isDisplay;         // is display mode on
+
+void initialise()
+{
+    x = 7;
+    y = 7;
+    isRunning = false;
+    isDisplay = false;
+}
+
+void touchStart (int index, float x, float y, float z, float vz)
+{
+    isRunning = !isRunning;
+}
+
+
+void handleButtonDown (int index)
+{
+    isDisplay = !isDisplay;
+}
+
+void repaint()
+{
+// Clear display with fade:
+    //clearDisplay();
+    if (isDisplay)
+    {
+        drawNumber(x, 0xFF000000, 1, 1);
+        drawNumber(y, 0xFF000000, 1, 9);
+    }
+    blendRect(makeARGB(30, 0, 0, 0), 0, 0, 15, 15);
+
+// Draw particle:
+    fillPixel(prtColour, x ,y);
+
+// Update coordinates:
+    if (isRunning)
+    {
+        int choice = getRandomInt(4);
+
+        // Periodic Boundary Conditions:
+        if (isPeriodic)
+        {
+            if (choice == 0)
+                x = (x + 1) % 15;
+            else if (choice == 1)
+                x = (15 + x - 1) % 15;
+            else if (choice == 2)
+                y = (y + 1) % 15;
+            else
+                y = (15 + y - 1) % 15;
+        }
+        // Bounce off the walls:
+        else
+        {
+            if (choice == 0)
+                if (x == 14)
+                    x -= 1;
+                else
+                    x += 1;
+            else if (choice == 1)
+                if (x == 0)
+                    x += 1;
+                else
+                    x -= 1;
+            else if (choice == 2)
+                if (y == 14)
+                    y -= 1;
+                else
+                    y += 1;
+            else
+                if (y == 0)
+                    y += 1;
+                else
+                    y -= 1;       
+        }
+
+        // Update colour:
+        if (isDisco)
+        {
+            prtColour = makeARGB(255,
+                                 getRandomInt(256),
+                                 getRandomInt(256),
+                                 getRandomInt(256)
+                                );
+        }
+    }
+
+// Print coordinates:
+    if (isDisplay)
+    {
+        drawNumber(x, 0xFFFFFFFF, 1, 1);
+        drawNumber(y, 0xFFFFFFFF, 1, 9);
+    }
+}
