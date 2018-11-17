@@ -3,11 +3,12 @@
           details="Tap to start or stop the particle, press the side button to cycle through particle colour modes (Normal, Rainbow and Disco)."
           target="Lightpad">
     <variables>
-        <variable name="normColour" displayName="Particle Colour"              type="colour"                     value="0xFFFFFF00" />
-        <variable name="radius"     displayName="Particle Radius"              type="float"  min="0.0" max="2.5" value="0.2"        />
-        <variable name="rate"       displayName="Particle Speed"               type="float"  min="0.5" max="3.0" value="1.75"       />
-        <variable name="fade"       displayName="Trail Fade Rate"              type="int"    min="0"   max="10"  value="2"          />
-        <variable name="boundary"   displayName="Boundary Conditions" type="option" options="Bounce;Periodic"    value="Bounce"     />
+        <variable name="initColourMode" displayName="Starting Colour Mode" type="option" options="Normal;Rainbow;Disco" value="Normal"     />    
+        <variable name="normColour"     displayName="Normal Mode Colour"   type="colour"                                value="0xFFFFFF00" />
+        <variable name="radius"         displayName="Particle Radius"      type="float"  min="0.0" max="2.5"            value="0.2"        />
+        <variable name="rate"           displayName="Particle Speed"       type="float"  min="0.5" max="3.0"            value="1.75"       />
+        <variable name="fade"           displayName="Trail Fade Rate"      type="int"    min="0"   max="10"             value="2"          />
+        <variable name="boundary"       displayName="Boundary Conditions"  type="option" options="Bounce;Periodic"      value="Bounce"     />
     </variables>
 </metadata>
 */
@@ -53,8 +54,12 @@ void initialise()
     
     hue = 0;
     hueRate = 4;
-    colourMode = 0;                 // Begin in Normal colour mode
-    prtColour = normColour;
+    
+    colourMode = initColourMode;
+    if (colourMode == 1)            // if Rainbow mode, initialize with hue = 0
+        prtColour = makeARGBfromAHSV(255, hue, 255, 255);
+    else                            // otherwise, initialuze with chosen colour
+        prtColour = normColour;
 }
 
 
