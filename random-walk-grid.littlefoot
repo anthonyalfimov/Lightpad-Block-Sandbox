@@ -37,6 +37,8 @@ int hueRate;
 
 void initialise()
 {
+    clearDisplay();
+    
     x = 7;
     y = 7;
     isRunning = false;
