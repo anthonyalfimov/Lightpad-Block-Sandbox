@@ -5,7 +5,7 @@
     <variables>
         <variable name="prtColour"  displayName="Particle Colour" type="colour" value="0xFFFF00" />
         <variable name="colourMode" displayName="Colour Mode"    type="option" options="Normal;Rainbow;Disco"    value="Normal"     />
-        <variable name="fade"       displayName="Fade Rate"                    type="int"    min="0"   max="10"  value="1"          />
+        <variable name="fade"       displayName="Trail Fade Rate"              type="int"    min="0"   max="10"  value="1"          />
         <variable name="boundary"   displayName="Boundary Conditions" type="option" options="Bounce;Periodic"    value="Bounce"     />
     </variables>
 </metadata>
