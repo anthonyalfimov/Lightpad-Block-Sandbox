@@ -1,0 +1,276 @@
+/*
+<metadata description="Random walking particle on your Lightpad Block!"
+          details="Tap to start or stop the particle, press the side button to display particle coordinates."
+          target="Lightpad">
+    <variables>
+        <variable name="prtColour"  displayName="Particle Colour"              type="colour"                     value="0xFFFFFF00" />
+        <variable name="colourMode" displayName="Colour Mode"    type="option" options="Normal;Rainbow;Disco"    value="Normal"     />
+        <variable name="radius"     displayName="Particle Radius"              type="float"  min="0.0" max="2.5" value="0.2"        />
+        <variable name="rate"       displayName="Particle Speed"               type="float"  min="0.5" max="3.0" value="1.75"       />
+        <variable name="fade"       displayName="Fade Rate"                    type="int"    min="0"   max="10"  value="2"          />
+        <variable name="boundary"   displayName="Boundary Conditions" type="option" options="Bounce;Periodic"    value="Bounce"     />
+    </variables>
+</metadata>
+*/
+
+
+//==============================================================================
+//  Global Variables
+//==============================================================================
+
+// Position
+float x;
+float y;
+
+// Particle size
+//float radius;
+
+// Bounce boundary
+float maxCoord;
+
+// State variables
+bool isRunning;                     // is simulation running
+bool isDisplay;                     // is display mode on
+
+// Colour variables
+int hue;
+int hueRate;
+
+//==============================================================================
+//  Initialization and repaint loop
+//==============================================================================
+
+void initialise()
+{
+    maxCoord = 15.0 - radius;       // maximum allowed coordinate when particle bounces off the walls
+    
+    x = 7.0;
+    y = 7.0;
+    isRunning = false;
+    isDisplay = false;
+    
+    hue = 0;
+    hueRate = 4;
+    if (colourMode == 1)
+        prtColour = makeARGBfromAHSV(255, hue, 255, 255);
+}
+
+
+//==============================================================================
+//  Handlers
+//==============================================================================
+
+void touchStart (int index, float x, float y, float z, float vz)
+{
+    isRunning = !isRunning;
+}
+
+
+void handleButtonDown (int index)
+{
+    isDisplay = !isDisplay;
+}
+
+//==============================================================================
+//  Coordinate generation
+//==============================================================================
+
+// Coordinate update function for Periodic Boundary Conditions
+float displacePeriodic(float var)
+{
+    var += (getRandomFloat() - 0.5) * 2 * rate;
+    if (var < 0.0)
+        var += 15.0;
+    else if (var > 15.0)
+        var -= 15.0;
+        
+    return var;
+}
+
+// Coordinate update function for Bounce Boundary Conditions
+float displaceBounce(float var)
+{
+    var += (getRandomFloat() - 0.5) * 2 * rate;
+    if (var < radius)
+     // var = radius + (radius - var)
+        var = 2 * radius - var;
+    else if (var > maxCoord)
+     // var = maxCoord - (var - maxCoord)
+        var = 2 * maxCoord - var;
+        
+    return var;
+}
+
+//==============================================================================
+//  Colour functions
+//==============================================================================
+
+// Integer HSV to RGB conversion (All-integer function)
+// All parameters are assumed to be 8 bit (0 - 255)
+int makeARGBfromAHSV(int alpha, int h, int s, int v)
+{
+    // If grayscale:
+    if (s == 0)
+        return makeARGB(alpha, v, v, v);
+
+    int region     = h / 43;
+    int remainder  = h - (region * 43);   // range 0 - 42
+
+    int p, q, t;
+    p = v * (255 - s) / 255;
+    q = v * (255 - (s * remainder) / 43) / 255;
+    t = v * (255 - (s * (43 - remainder)) / 43) / 255;
+
+    if (region == 0)
+        return makeARGB(alpha, v, t, p);
+    else if (region == 1)
+        return makeARGB(alpha, q, v, p);
+    else if (region == 2)
+        return makeARGB(alpha, p, v, t);
+    else if (region == 3)
+        return makeARGB(alpha, p, q, v);
+    else if (region == 4)
+        return makeARGB(alpha, t, p, v);
+    else
+        return makeARGB(alpha, v, p, q);
+}
+
+//==============================================================================
+//  Repaint loop
+//==============================================================================
+
+void repaint()
+{
+// Clear display with fade:
+    if (isDisplay)
+    {
+        drawNumber(int(x), 0xFF000000, 1, 1);
+        drawNumber(int(y), 0xFF000000, 1, 9);
+    }
+    blendRect(makeARGB(fade * 10, 0, 0, 0), 0, 0, 15, 15);
+
+// Draw particle:
+    blendCircle(prtColour, x, y, radius, false);
+
+// Update coordinates:
+    if (isRunning)
+    {
+        // Periodic Boundary Conditions:
+        if (boundary == 1)
+        {
+            x = displacePeriodic(x);
+            y = displacePeriodic(y);
+        }
+        // Bounce off the walls:
+        else
+        {
+             x = displaceBounce(x);
+             y = displaceBounce(y);   
+        }
+
+        // Update colour:
+        if (colourMode == 1)
+        {
+            hue = (hue + hueRate) % 256;
+            prtColour = makeARGBfromAHSV(255, hue, 255, 255);
+        }
+        else if (colourMode == 2)
+            prtColour = makeARGBfromAHSV(255, 
+                                         getRandomInt(256),
+                                         255,
+                                         255);
+    }
+
+// Print coordinates:
+    if (isDisplay)
+    {
+        drawNumber(int(x), 0xFFFFFFFF, 1, 1);
+        drawNumber(int(y), 0xFFFFFFFF, 1, 9);
+    }
+}
+
+
+
+/*
+<display backgroundColour="0xFF161616" textColour ="0xFFFFCA00">
+    <pixels>
+        <pixel index="17" colour="0xFFFF00AD" />
+        <pixel index="18" colour="0xFFFF00AD" />
+        <pixel index="23" colour="0xFFB7EBFF" />
+        <pixel index="25" colour="0xFFB7FFD8" />
+        <pixel index="31" colour="0xFFFF00AD" />
+        <pixel index="32" colour="0xFFFF00AD" />
+        <pixel index="33" colour="0xFFFF00FD" />
+        <pixel index="34" colour="0xFFCF00FF" />
+        <pixel index="46" colour="0xFFFF00AD" />
+        <pixel index="47" colour="0xFFFF00FD" />
+        <pixel index="48" colour="0xFFCF00FF" />
+        <pixel index="49" colour="0xFF8700FF" />
+        <pixel index="50" colour="0xFF5B00FF" />
+        <pixel index="57" colour="0xFFB7EBFF" />
+        <pixel index="62" colour="0xFFCF00FF" />
+        <pixel index="63" colour="0xFF8700FF" />
+        <pixel index="64" colour="0xFF5B00FF" />
+        <pixel index="65" colour="0xFF2200FF" />
+        <pixel index="66" colour="0xFF0011FF" />
+        <pixel index="70" colour="0xFFC4FFB7" />
+        <pixel index="78" colour="0xFF5B00FF" />
+        <pixel index="79" colour="0xFF2200FF" />
+        <pixel index="80" colour="0xFF0011FF" />
+        <pixel index="81" colour="0xFF006FFF" />
+        <pixel index="82" colour="0xFF00B7FF" />
+        <pixel index="94" colour="0xFF0011FF" />
+        <pixel index="95" colour="0xFF006FFF" />
+        <pixel index="96" colour="0xFF00B7FF" />
+        <pixel index="97" colour="0xFF00FFFF" />
+        <pixel index="98" colour="0xFF00FFC5" />
+        <pixel index="102" colour="0xFFFFFEB7" />
+        <pixel index="110" colour="0xFF00B7FF" />
+        <pixel index="111" colour="0xFF00FFFF" />
+        <pixel index="112" colour="0xFF00FFC5" />
+        <pixel index="113" colour="0xFF00FF76" />
+        <pixel index="114" colour="0xFF00FF26" />
+        <pixel index="121" colour="0xFFB7FFD8" />
+        <pixel index="126" colour="0xFF00FFC5" />
+        <pixel index="127" colour="0xFF00FF76" />
+        <pixel index="128" colour="0xFF00FF26" />
+        <pixel index="129" colour="0xFF3FFF00" />
+        <pixel index="130" colour="0xFF87FF00" />
+        <pixel index="131" colour="0xFFFFFEB7" />
+        <pixel index="132" colour="0xFFFFFEB7" />
+        <pixel index="142" colour="0xFF00FF26" />
+        <pixel index="143" colour="0xFF3FFF00" />
+        <pixel index="144" colour="0xFF87FF00" />
+        <pixel index="145" colour="0xFFFFCA00" />
+        <pixel index="146" colour="0xFFFFCA00" />
+        <pixel index="147" colour="0xFFFFFEB7" />
+        <pixel index="148" colour="0xFFFFFEB7" />
+        <pixel index="151" colour="0xFFB7EBFF" />
+        <pixel index="153" colour="0xFFC4FFB7" />
+        <pixel index="158" colour="0xFF87FF00" />
+        <pixel index="159" colour="0xFFFFCA00" />
+        <pixel index="160" colour="0xFFFFFD00" />
+        <pixel index="161" colour="0xFFFFFD00" />
+        <pixel index="162" colour="0xFFFFCA00" />
+        <pixel index="163" colour="0xFFFFFEB7" />
+        <pixel index="171" colour="0xFFFFFEB7" />
+        <pixel index="173" colour="0xFFFFFEB7" />
+        <pixel index="174" colour="0xFFFFCA00" />
+        <pixel index="175" colour="0xFFFFFD00" />
+        <pixel index="176" colour="0xFFFFFD00" />
+        <pixel index="177" colour="0xFFFFCA00" />
+        <pixel index="178" colour="0xFFFFFEB7" />
+        <pixel index="184" colour="0xFFB7FFC4" />
+        <pixel index="188" colour="0xFFFFFEB7" />
+        <pixel index="189" colour="0xFFFFFEB7" />
+        <pixel index="190" colour="0xFFFFCA00" />
+        <pixel index="191" colour="0xFFFFCA00" />
+        <pixel index="192" colour="0xFFFFFEB7" />
+        <pixel index="193" colour="0xFFFFFEB7" />
+        <pixel index="204" colour="0xFFFFFEB7" />
+        <pixel index="205" colour="0xFFFFFEB7" />
+        <pixel index="206" colour="0xFFFFFEB7" />
+        <pixel index="207" colour="0xFFFFFEB7" />
+    </pixels>
+</display>
+*/
