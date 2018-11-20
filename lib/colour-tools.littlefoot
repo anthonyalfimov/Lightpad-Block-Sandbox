@@ -1,4 +1,4 @@
-
+// TODO: Title
 
 // Integer HSV to RGB conversion (All-integer function)
 // All parameters are assumed to be 8 bit (0 - 255)
@@ -38,11 +38,4 @@ void showColourMap()
     for (int x = 0; x < 15; x++)
         for (int y = 0; y < 15; y++)
             blendPixel(makeARGBfromAHSV(255, 17 * x, 255, 255 - 17 * y), x, y);
-}
-
-
-void initialise()
-{
-    clearDisplay();
-    showColourMap();
 }

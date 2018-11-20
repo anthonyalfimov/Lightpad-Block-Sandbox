@@ -1,0 +1,234 @@
+/*
+
+  This test program measures time it takes to draw a Colour Map
+  using integer and float versions of HSV to RGB function,
+  displays it on the block itself and logs it.
+  It also compares the time it takes to draw an HSV Colour Map
+  with the time it takes to draw a simple RGB colour fill.
+  
+  Tap the surface to run the function or clear the screen,
+  press the side button to cycle between Int and Float
+  version of the function, as well as a simple RGB function
+  for comparison.
+  
+  TODO:
+  
+  Is there a need to optimize these HSV functions?
+  
+  With 25Hz refresh rate, the `repaint()` function is called
+  every 40 ms.
+  
+  What happens when a function inside `repaint()` takes longer
+  than 40 ms to compute?
+  
+  Can we further optimize the Int function by manually forming
+  the ARGB output?
+  Do away with if statements?
+
+*/
+
+// Global variables
+int  mode;          // HSV mode flag: 0 - Int;   1 - Float;  2 - Simple (RGB)
+bool isClean;       // Screen stated: 1 - Empty; 0 - Painted ColourMap
+
+// Mode indication functions
+void indicateFloat()
+{
+    // Draw "F"
+    for (int i = 1; i < 4; i++)
+        for (int j = 1; j < (5 - i); j++)
+            fillPixel(0xFFFFFF, j, i);
+}
+
+void indicateInt()
+{
+    // Draw "I"
+    for (int i = 1; i < 4; i += 2)
+        for (int j = 1; j < 4; j++)
+            fillPixel(0xFFFFFF, j, i);
+    fillPixel(0xFFFFFF, 2, 2);
+}
+
+void indicateSimple()
+{
+    // Draw "0"
+    for (int i = 1; i < 4; i += 2)
+        for (int j = 1; j < 4; j++)
+            fillPixel(0xFFFFFF, j, i);
+    fillPixel(0xFFFFFF, 1, 2);
+    fillPixel(0xFFFFFF, 3, 2);
+}
+
+// Integer HSV to RGB conversion
+// All parameters are assumed to be in the range 0 - 255
+int intAHSV(int alpha, int h, int s, int v)
+{
+    // If grayscale:
+    if (s == 0)
+        return makeARGB(alpha, v, v, v);
+
+    int region     = h / 43;
+    int remainder  = h - (region * 43);   // range 0 - 42
+
+    int p, q, t;
+    // Some ugly normalization happens here
+    p = v * (255 - s) / 255;
+    q = v * (255 - (s * remainder) / 43) / 255;
+    t = v * (255 - (s * (43 - remainder)) / 43) / 255;
+
+    if (region == 0)
+        return makeARGB(alpha, v, t, p);
+    else if (region == 1)
+        return makeARGB(alpha, q, v, p);
+    else if (region == 2)
+        return makeARGB(alpha, p, v, t);
+    else if (region == 3)
+        return makeARGB(alpha, p, q, v);
+    else if (region == 4)
+        return makeARGB(alpha, t, p, v);
+    else
+        return makeARGB(alpha, v, p, q);
+}
+
+// Standard function overload to work with floats
+int makeARGB(float a, float r, float g, float b)
+{
+    return makeARGB(
+        int(255 * a),
+        int(255 * r),
+        int(255 * g),
+        int(255 * b)
+    )
+}
+
+// Floating point HSV to RGB conversion
+// Alpha is 0.0 - 1.0
+// Hue is   0.0 - 360.0
+// Sat is   0.0 - 1.0
+// Val is   0.0 - 1.0
+int floatAHSV(float alpha, float h, float s, float v)
+{
+    // If grayscale:
+    if (s == 0.0)
+        return makeARGB(alpha, v, v, v);
+
+    h /= 60.0;
+    int   region = int(h);
+    float fract  = h - region;
+
+    float p, q, t;
+    p = v * (1.0 - s);
+    q = v * (1.0 - s * fract);
+    t = v * (1.0 - s * (1.0 - fract));
+
+    if (region == 0)
+        return makeARGB(alpha, v, t, p);
+    else if (region == 1)
+        return makeARGB(alpha, q, v, p);
+    else if (region == 2)
+        return makeARGB(alpha, p, v, t);
+    else if (region == 3)
+        return makeARGB(alpha, p, q, v);
+    else if (region == 4)
+        return makeARGB(alpha, t, p, v);
+    else
+        return makeARGB(alpha, v, p, q);
+
+}
+
+
+// Colour map functions
+
+void intColourMap()
+{
+    for (int x = 0; x < 15; x++)
+        for (int y = 0; y < 15; y++)
+            blendPixel(intAHSV(255, 17 * x, 255, 255 - 17 * y), x, y);
+
+    // Log function call time:
+    int time = getTimeInCurrentFunctionCall();
+    log(time);
+    drawNumber(time, 0xFFFFFFFF, 1, 9);
+}
+
+void floatColourMap()
+{
+    for (int x = 0; x < 15; x++)
+        for (int y = 0; y < 15; y++)
+            blendPixel(floatAHSV(1.0, 24.0 * x, 1.0, 1.0 - y / 15.0), x, y);
+
+    // Log function call time:
+    int time = getTimeInCurrentFunctionCall();
+    log(time);
+    drawNumber(time, 0xFFFFFFFF, 1, 9);
+}
+
+void simpleColourMap()
+{
+    for (int x = 0; x < 15; x++)
+        for (int y = 0; y < 15; y++)
+            blendPixel(makeARGB(255, 15 * x, 255 - 15 * x, 0), x, y);
+
+    // Log function call time:
+    int time = getTimeInCurrentFunctionCall();
+    log(time);
+    drawNumber(time, 0xFFFFFFFF, 1, 9);
+}
+
+
+// Event handlers
+
+void handleButtonDown (int index)
+{
+    mode = (mode + 1) % 3;
+    clearDisplay();
+}
+
+
+void touchStart (int index, float x, float y, float z, float vz)
+{
+    if (isClean)
+    {
+        if (mode == 1)
+        {
+            floatColourMap();
+            indicateFloat();
+        }
+        else if (mode == 2)
+        {
+            simpleColourMap();
+            indicateSimple();
+        }
+        else
+        {
+            intColourMap();
+            indicateInt();
+        }
+        isClean = false;
+    }
+    else
+    {
+        clearDisplay();
+        isClean = true;
+    }
+}
+
+
+void initialise()
+{
+    clearDisplay();
+    mode = 0;           // Int mode
+    isClean = 1;        // Display is clean
+}
+
+
+void repaint()
+{
+    if (mode == 1)
+        indicateFloat();
+    else  if (mode == 2)
+        indicateSimple();
+    else
+        indicateInt();
+
+}
