@@ -5,22 +5,19 @@
   displays it on the block itself and logs it.
   It also compares the time it takes to draw an HSV Colour Map
   with the time it takes to draw a simple RGB colour fill.
-  
+
   Tap the surface to run the function or clear the screen,
   press the side button to cycle between Int and Float
   version of the function, as well as a simple RGB function
   for comparison.
-  
+
   TODO:
-  
+
   Is there a need to optimize these HSV functions?
-  
+
   With 25Hz refresh rate, the `repaint()` function is called
-  every 40 ms.
-  
-  What happens when a function inside `repaint()` takes longer
-  than 40 ms to compute?
-  
+  every 40 ms. The function takes 23 ms to execute as of right now.
+
   Can we further optimize the Int function by manually forming
   the ARGB output?
   Do away with if statements?
