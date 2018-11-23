@@ -29,7 +29,7 @@ void printOnTime()
     else if (minutes < 100)
         drawNumber(minutes, 0xFFFFFFFF, 2, 2);
     else
-        fillRect(0x100000, 1, 2, 13,  5);
+        fillRect(0x550000, 1, 2, 13,  5);
     
     if (seconds < 10)
     {
