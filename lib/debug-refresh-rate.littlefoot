@@ -1,0 +1,48 @@
+/*
+  With 25Hz refresh rate, the `repaint()` function is called
+  every 40 ms.
+
+  When `repaint()` execution takes longer than 40 ms,
+  the refresh rate slows down accordingly.
+  
+  If `repaint()` execution takes over 1000 ms, further calls to
+  it stop (no refresh).
+*/
+
+
+// This function can be used to test repaint() call rate
+//     by counting seconds to two decimal places
+void drawTimer()
+{
+    drawNumber(getMillisecondCounter() / 1000 % 100, 0xFFFFFFFF, 2, 2);
+    drawNumber(getMillisecondCounter() / 10   % 100, 0xFFFFFFFF, 2, 8);
+    fillPixel(0xFFFFFF, 12, 6);         // separator
+}
+
+
+// This function can be used to test repaint() call rate
+//     by running a pixel across the screen at the nominal refresh rate (every 40 ms)
+int db_frames;
+void drawRunner()
+{
+    db_frames = getMillisecondCounter() / 40 % 225;
+    fillPixel(0xFFFFFF, db_frames % 15, db_frames / 15);
+}
+
+
+// Test function that takes given time (in ms) to compute
+void hault(int ms)
+{
+    while (getTimeInCurrentFunctionCall() < ms)
+        continue;
+}
+
+
+void repaint()
+{
+    clearDisplay();
+    //hault(100);
+    //drawTimer();
+    drawRunner();
+    log(getTimeInCurrentFunctionCall());
+}
