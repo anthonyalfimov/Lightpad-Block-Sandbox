@@ -6,7 +6,7 @@
   the refresh rate slows down accordingly.
   
   If `repaint()` execution takes over 1000 ms, further calls to
-  it stop (no refresh).
+  it seize (display is not repainted).
 */
 
 
@@ -30,7 +30,7 @@ void drawRunner()
 }
 
 
-// Test function that takes given time (in ms) to compute
+// Test function pretends that it takes given time (in ms) to compute
 void hault(int ms)
 {
     while (getTimeInCurrentFunctionCall() < ms)
