@@ -11,7 +11,7 @@ void printOnTime()
     fillRect(0x101010, 1, 2, 13,  5);
     fillRect(0x101010, 1, 8, 13,  5);
     
-    if (getMillisecondCounter() / 500 % 2 == 1)
+    if (getMillisecondCounter() / 500 % 2 == 0)
     {
         fillPixel(0xFFFFFF, 12, 3);
         fillPixel(0xFFFFFF, 12, 5);
