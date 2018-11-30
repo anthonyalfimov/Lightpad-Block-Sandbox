@@ -4,7 +4,7 @@
 
   When `repaint()` execution takes longer than 40 ms,
   the refresh rate slows down accordingly.
-  
+
   If `repaint()` execution takes over 1000 ms, further calls to
   it seize (display is not repainted).
 */
