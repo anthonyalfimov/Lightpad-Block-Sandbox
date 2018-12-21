@@ -1,0 +1,154 @@
+//==============================================================================
+//  Global State variables
+//==============================================================================
+bool isBlinking;
+
+//==============================================================================
+//  Drawing Functions
+//==============================================================================
+
+void drawBG()
+{
+    // Simple programmatical BG without "shimmer"
+
+    for (int i = 0; i < 5; i++)
+    {
+        blendRect(makeARGB(25 - 5 * i, 0, 0, 255),
+                  i,      0, 1, 15);
+        blendRect(makeARGB(25 - 5 * i, 0, 0, 255),
+                  14 - i, 0, 1, 15);
+    }
+}
+
+/**
+@param rgb    colour to use
+@param cx     x coordinate of the segment centre
+@param y      y coordinate of the top of the segment
+@param levels number of steps to draw below the triangular top
+*/
+void drawTreeSegment(int rgb, int cx, int y, int levels)
+{
+    // Draw the triangular top
+    fillPixel(rgb, cx, y);
+    fillRect(rgb, cx - 1, y + 1, 3, 1);
+
+    // Draw the steps
+    for (int i = 0; i < levels; i++)
+    {
+        fillRect(rgb, cx - 2 - i, y + 2 + i, 2, 1);
+        fillRect(rgb, cx + 1 + i, y + 2 + i, 2, 1);
+    }
+}
+
+void drawTinselLine(int x, int y, int length)
+{
+    for (int i = 0; i < length; i++)
+        blendPixel(makeARGB(40 + getRandomInt(60), 255, 255, 0),
+                   x + i, y + i);
+}
+
+void drawTinsel(int cx, int y)
+{
+    drawTinselLine(cx - 1, y + 2, 4);
+    drawTinselLine(cx - 2, y + 5, 7);
+    drawTinselLine(cx - 3, y + 8, 4);
+}
+
+void drawLightsLine(int x, int y, int num)
+{
+    for (int i = 0; i < num; i++)
+        blendPixel(0xFF00FFFF, x + 2 * i, y + 2 * i);
+}
+
+void drawLights(int cx, int y)
+{
+    if (!isBlinking || (getMillisecondCounter() / 500 % 2 == 0))
+    {
+        drawLightsLine(cx - 1, y + 3, 2);
+        drawLightsLine(cx - 2, y + 6, 3);
+        drawLightsLine(cx - 3, y + 9, 2);
+    }
+}
+
+void drawBaubles(int cx, int y)
+{
+    blendPixel(0xFFFF0000, cx + 1, y +  3);
+    blendPixel(0xFFFF0000, cx - 1, y +  5);
+    blendPixel(0xFFFF0000, cx + 2, y +  8);
+    blendPixel(0xFFFF0000, cx - 2, y + 10);
+}
+
+void drawStar(int cx, int y)
+{
+    // Centre
+    blendPixel(0xFFFFFFFF, cx,     y - 1);
+    
+    // Star
+    blendPixel(0xFFFFFF00, cx,     y - 2);
+    blendPixel(0xFFFFFF00, cx - 1, y - 1);
+    blendPixel(0xFFFFFF00, cx + 1, y - 1);
+    
+    // Glow
+    blendPixel(0x60FFFF00, cx, y);
+    
+    blendPixel(0x20FFFF00, cx - 1, y - 2);
+    blendPixel(0x20FFFF00, cx + 1, y - 2);
+    
+    blendPixel(0x20FFFF00, cx - 1, y);
+    blendPixel(0x20FFFF00, cx + 1, y);
+    
+    blendPixel(0x20FFFF00, cx - 2, y - 1);
+    blendPixel(0x20FFFF00, cx + 2, y - 1);
+}
+
+const int treeColourMain   = 0x00FF00;
+const int treeColourAccent = 0x004000;
+/**
+@param cx     x coordinate of the tree centre
+@param y      y coordinate of the top of the tree
+*/
+void drawTree(int cx, int y)
+{
+    drawTreeSegment(treeColourMain,   cx, y,      1);
+    drawTreeSegment(treeColourAccent, cx, y + 2,  2);
+    drawTreeSegment(treeColourMain,   cx, y + 4,  3);
+    drawTreeSegment(treeColourAccent, cx, y + 6,  4);
+    drawTreeSegment(treeColourMain,   cx, y + 8,  3);
+    drawTreeSegment(treeColourAccent, cx, y + 10, 0);
+
+    fillPixel(0x211200, cx,     y + 12);
+    fillPixel(0x151000, cx + 1, y + 12);
+    fillPixel(0x151000, cx - 1, y + 12);
+
+    drawTinsel(cx, y);
+    drawBaubles(cx, y);
+    drawLights(cx, y);
+    drawStar(cx, y);
+}
+
+//==============================================================================
+//  Initialization
+//==============================================================================
+
+
+void initialise()
+{
+    isBlinking = false;
+}
+
+void repaint()
+{
+    clearDisplay();
+    drawBG();
+    drawTree(7, 2);
+}
+
+//==============================================================================
+//  Event Handlers
+//==============================================================================
+
+
+void handleButtonDown (int index)
+{
+    isBlinking = !isBlinking;
+}
