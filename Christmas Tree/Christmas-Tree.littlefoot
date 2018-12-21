@@ -3,11 +3,11 @@
 </metadata>
 */
 
-
 //==============================================================================
 //  Global State Variables
 //==============================================================================
-bool isBlinking;
+bool isBlinking;        // Lights blinking or always on
+bool isMagic;           // Magic is happenning or not
 
 //==============================================================================
 //  Drawing Functions
@@ -28,7 +28,7 @@ void drawBG()
     }
 }
 
-//==== Tinsel ===================================================================
+//==== Tinsel ==================================================================
 
 void drawTinselLine(int x, int y, int length)
 {
@@ -44,7 +44,7 @@ void drawTinsel(int cx, int y)
     drawTinselLine(cx - 3, y + 8, 4);
 }
 
-//==== Lights ===================================================================
+//==== Lights ==================================================================
 
 // Lights Colour Constants
 const int lightsColour = 0xFF00FFFF;
@@ -66,7 +66,7 @@ void drawLights(int cx, int y)
     }
 }
 
-//==== Baubles ===================================================================
+//==== Baubles =================================================================
 
 // Bauble Colour Constants
 const int baubleColour = 0xFFFF0000;
@@ -79,7 +79,7 @@ void drawBaubles(int cx, int y)
     blendPixel(baubleColour, cx - 2, y + 10);
 }
 
-//==== Star ======================================================================
+//==== Star ====================================================================
 
 // Star Colour & glow Variables
 int starColour;             // colour of the star
@@ -96,25 +96,25 @@ void drawStar(int cx, int y)
     // Glow pulse rate
     // Triangle wave with values in [0 - 128]
     glowValue = abs((getMillisecondCounter() / glowPeriod) % 257 - 128);
-    
+
     // Centre
     blendPixel(0xFFFFFFFF, cx,     y - 1);
 
     // Star
     starColour = makeARGB(200 + glowValue * 55 / 128, 255, 220, 0);
-    
+
     blendPixel(starColour, cx,     y - 2);
     blendPixel(starColour, cx - 1, y - 1);
     blendPixel(starColour, cx + 1, y - 1);
-    
+
     // Tree illumination
     illumColour = makeARGB(60 + glowValue * 32 / 128, 255, 255, 0);
-    
+
     blendPixel(illumColour, cx,     y);
 
     // Primary Glow
     glowColour1 = makeARGB(8 + glowValue * 24 / 128, 255, 255, 0);
-    
+
     blendPixel(glowColour1, cx - 1, y - 2);
     blendPixel(glowColour1, cx + 1, y - 2);
 
@@ -126,7 +126,7 @@ void drawStar(int cx, int y)
 
     // Secondary Glow
     glowColour2 = makeARGB(glowValue * 6 / 128, 255, 200, 0 );
-    
+
     blendPixel(glowColour2, cx - 2, y - 2);
     blendPixel(glowColour2, cx + 2, y - 2);
 
@@ -137,7 +137,7 @@ void drawStar(int cx, int y)
     blendPixel(glowColour2, cx + 3, y - 1);
 }
 
-//==== Tree ======================================================================
+//==== Tree ====================================================================
 
 /**
 @param rgb    colour to use
@@ -183,6 +183,30 @@ void drawTree(int cx, int y)
     drawBaubles(cx, y);
     drawLights(cx, y);
     drawStar(cx, y);
+
+    if (isMagic)
+        drawMagic(cx, y);
+}
+
+//==== Magic Ring ==============================================================
+
+// Magic Ring Constants
+const int ringColour = 0xA0FFFF00;
+const float maxRingRadius = 15.0;       // reset animation after reaching this
+const float ringRate = 0.7;             // rate of ring animation
+
+// Magic Ring Variables
+float ringRadius;
+
+void drawMagic(int cx, int y)
+{
+    blendCircle(ringColour, float(cx), float(y - 1), ringRadius, false);
+    ringRadius += ringRate;
+    if (ringRadius > maxRingRadius)
+    {
+        ringRadius = 0;
+        isMagic = false;
+    }
 }
 
 //==============================================================================
@@ -192,7 +216,17 @@ void drawTree(int cx, int y)
 
 void initialise()
 {
+    // Lights
     isBlinking = true;
+
+    // Magic Ring
+    isMagic = false;
+    ringRadius = 0;
+    
+    // Star location constraints
+    maxY = 1.9 * 3  / 14;
+    minX = 1.9 * 6  / 14;
+    maxX = 1.9 * 10 / 14;
 }
 
 //==============================================================================
@@ -211,10 +245,27 @@ void repaint()
 //  Event Handlers
 //==============================================================================
 
+//==== Button ==================================================================
 
 void handleButtonDown (int index)
 {
     isBlinking = !isBlinking;
+}
+
+//==== Touch ===================================================================
+
+// Star location constraints
+float maxY;
+float minX;
+float maxX;
+
+void touchStart (int index, float x, float y, float z, float vz)
+{
+    if ( y < maxY && x > minX && x < maxX )
+    {
+        isMagic = true;
+        ringRadius = 0;     // reset the ring on consequent touch
+    }
 }
 
 
