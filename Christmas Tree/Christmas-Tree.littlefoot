@@ -3,11 +3,11 @@
 </metadata>
 */
 
-
 //==============================================================================
 //  Global State Variables
 //==============================================================================
-bool isBlinking;
+bool isBlinking;        // Lights blinking or always on
+bool isMagic;           // Magic is happenning or not
 
 //==============================================================================
 //  Drawing Functions
@@ -183,6 +183,30 @@ void drawTree(int cx, int y)
     drawBaubles(cx, y);
     drawLights(cx, y);
     drawStar(cx, y);
+
+    if (isMagic)
+        drawMagic(cx, y);
+}
+
+//==== Magic Ring ==============================================================
+
+// Magic Ring Constants
+const int ringColour = 0xA0FFFF00;
+const float maxRingRadius = 15.0;       // reset animation after reaching this
+const float ringRate = 0.7;             // rate of ring animation
+
+// Magic Ring Variables
+float ringRadius;
+
+void drawMagic(int cx, int y)
+{
+    blendCircle(ringColour, float(cx), float(y - 1), ringRadius, false);
+    ringRadius += ringRate;
+    if (ringRadius > maxRingRadius)
+    {
+        ringRadius = 0;
+        isMagic = false;
+    }
 }
 
 //==============================================================================
@@ -192,7 +216,17 @@ void drawTree(int cx, int y)
 
 void initialise()
 {
+    // Lights
     isBlinking = true;
+
+    // Magic Ring
+    isMagic = false;
+    ringRadius = 0;
+    
+    // Star location constraints
+    maxY = 1.9 * 3  / 14;
+    minX = 1.9 * 6  / 14;
+    maxX = 1.9 * 10 / 14;
 }
 
 //==============================================================================
@@ -211,10 +245,27 @@ void repaint()
 //  Event Handlers
 //==============================================================================
 
+//==== Button ==================================================================
 
 void handleButtonDown (int index)
 {
     isBlinking = !isBlinking;
+}
+
+//==== Touch ===================================================================
+
+// Star location constraints
+float maxY;
+float minX;
+float maxX;
+
+void touchStart (int index, float x, float y, float z, float vz)
+{
+    if ( y < maxY && x > minX && x < maxX )
+    {
+        isMagic = true;
+        ringRadius = 0;     // reset the ring on consequent touch
+    }
 }
 
 
