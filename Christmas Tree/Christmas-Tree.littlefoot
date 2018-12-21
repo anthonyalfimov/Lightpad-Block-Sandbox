@@ -1,5 +1,44 @@
 /*
-<metadata description="Festive Christmas Tree for your Lightpad Block!">
+<metadata   description="Festive Christmas Tree for your Lightpad Block!"
+            target="Lightpad"
+            tags="Fun;">
+    <variables>
+        <vector count="8" wantsGetFunctions="true" wantsSetFunctions="true">
+            <variable   name="SnowY"
+                        type="float"
+                        min="-15.0"
+                        max="15.0"
+                        value="0.0"
+                        visible="false" />
+        </vector>
+
+        <vector count="8" wantsGetFunctions="true" wantsSetFunctions="true">
+            <variable   name="SnowY0"
+                        type="float"
+                        min="-15.0"
+                        max="15.0"
+                        value="-1.0"
+                        visible="false" />
+        </vector>
+
+        <vector count="8" wantsGetFunctions="true" wantsSetFunctions="true">
+            <variable   name="SnowX0"
+                        type="float"
+                        min="-1.0"
+                        max="15.0"
+                        value="0.0"
+                        visible="false" />
+        </vector>
+
+        <vector count="8" wantsGetFunctions="true" wantsSetFunctions="true">
+            <variable   name="SnowPh"
+                        type="int"
+                        min="0"
+                        max="200"
+                        value="0"
+                        visible="false" />
+        </vector>
+    </variables>
 </metadata>
 */
 
@@ -8,6 +47,7 @@
 //==============================================================================
 bool isBlinking;        // Lights blinking or always on
 bool isMagic;           // Magic is happenning or not
+bool isSnowing;
 
 //==============================================================================
 //  Drawing Functions
@@ -28,12 +68,151 @@ void drawBG()
     }
 }
 
+//==== Snow ====================================================================
+
+// SnowFall Constants
+const float snowRate   = 0.07;      // default 0.07
+const float snowSize   = 0.01;      // default 0.01
+const int   snowPeriod = 20;        // default 20
+
+// SnowFall Colour Constants
+const int snowColourFG = 0xFFFFFFFF;
+const int snowColourMG = 0x40FFFFFF;
+const int snowColourBG = 0x18FFFFFF;
+
+const int snowColourBBG = 0x08FFFFFF;
+
+// Temporary snowflake coordinate variables
+float snowX, snowY;
+int   snowPh;
+
+void initSnowFall()
+{
+    // Snowflake initial positions
+    
+    // Foreground
+    // left
+    setSnowX0(0,  0.5);
+    setSnowY0(0, -1.0);
+    setSnowPh(0,  20);
+    // left
+    setSnowX0(1,  3.0);
+    setSnowY0(1, -8.0);
+    setSnowPh(1,  110);
+    // right
+    setSnowX0(2,  12.0);
+    setSnowY0(2, -3.5);
+    setSnowPh(2,  0);
+    // right
+    setSnowX0(3,  11.0);
+    setSnowY0(3, -12.0);
+    setSnowPh(3,  90);
+
+    // Background
+    
+    // left
+    setSnowX0(4,  0.0);
+    setSnowY0(4, -5.0);
+    setSnowPh(4,  180);
+    // left
+    setSnowX0(5,  1.5);
+    setSnowY0(5, -12.5);
+    setSnowPh(5,  130);
+    // right
+    setSnowX0(6,  13.0);
+    setSnowY0(6, -9.0);
+    setSnowPh(6,  150);
+    // right
+    setSnowX0(7,  10.0);
+    setSnowY0(7,  0.0);
+    setSnowPh(7,  50);
+    
+
+    isSnowing = false; // should be false
+}
+
+void resetSnowFall()
+{
+    for (int i = 0; i < 8; i++)
+    {
+        snowY = getSnowY0(i);
+        setSnowY(i, snowY);
+    }
+}
+
+// returns float offset in [0, 1], takes in phase shift
+float snowOffset(int phase)
+{
+    return abs( (getMillisecondCounter() / snowPeriod + phase) % 201 - 100 ) / 100.0;
+}
+
+void drawSnowFall(int argb, int start, int end)
+{
+    for (int i = start; i < end; i++)
+    {
+        snowPh = getSnowPh(i);
+        snowX  = getSnowX0(i) + 2.0 * snowOffset(snowPh);
+        snowY  = getSnowY(i);
+
+        // Draw snowflake
+        blendCircle(argb, snowX, snowY, snowSize, true);
+
+        // Update snowflake position
+        snowY += snowRate;
+        if (snowY > 15.06)
+            setSnowY(i, 0.0);
+        else
+            setSnowY(i, snowY);
+    }
+}
+
+void drawSnow(int cx, int y)
+{
+    blendPixel(snowColourBBG, cx - 2, y + 1);
+    blendPixel(snowColourBBG, cx + 2, y + 1);
+    
+    blendPixel(snowColourMG, cx - 2, y + 3);
+    
+    blendPixel(snowColourMG, cx - 3, y + 4);
+    blendPixel(snowColourBG, cx + 3, y + 4);
+    
+    blendPixel(snowColourMG, cx + 3, y + 6);
+    
+    blendPixel(snowColourBG, cx - 4, y + 7);
+    blendPixel(snowColourMG, cx + 4, y + 7);
+    
+    blendPixel(snowColourMG, cx - 4, y + 9);
+    
+    blendPixel(snowColourMG, cx - 5, y + 10);
+    blendPixel(snowColourBG, cx + 5, y + 10);
+    
+    // Left Pile
+    
+    blendPixel(snowColourMG, 0, 13);
+    blendPixel(snowColourFG, 0, 14);
+    blendPixel(snowColourMG, 1, 14);
+    
+    blendPixel(snowColourBG, 0, 12);
+    blendPixel(snowColourBG, 1, 13);
+    blendPixel(snowColourBBG, 2, 14);
+    
+    // Righ Pile
+    
+    blendPixel(snowColourMG, 14, 13);
+    blendPixel(snowColourFG, 14, 14);
+    blendPixel(snowColourMG, 13, 14);
+    
+    blendPixel(snowColourBBG, 12, 14);
+    blendPixel(snowColourBG, 13, 13);
+    blendPixel(snowColourBG, 14, 12);
+}
+
 //==== Tinsel ==================================================================
 
 void drawTinselLine(int x, int y, int length)
 {
     for (int i = 0; i < length; i++)
-        blendPixel(makeARGB(40 + getRandomInt(60), 255, 255, 128),
+        blendPixel(makeARGB(40 + getRandomInt(60), 255, 255, 0),
                    x + i, y + i);
 }
 
@@ -181,6 +360,7 @@ void drawTree(int cx, int y)
 
     drawTinsel(cx, y);
     drawBaubles(cx, y);
+    if (isSnowing) drawSnow(cx, y);
     drawLights(cx, y);
     drawStar(cx, y);
 
@@ -198,6 +378,23 @@ const float ringRate = 0.7;             // rate of ring animation
 // Magic Ring Variables
 float ringRadius;
 
+// Star location constraints
+const float maxY = 1.9 * 3  / 14;
+const float minX = 1.9 * 6  / 14;
+const float maxX = 1.9 * 10 / 14;
+
+// Initialiser
+void initMagicRing()
+{
+    isMagic = false;
+    ringRadius = 0;
+
+    // Star location constraints
+    //maxY = 1.9 * 3  / 14;
+    //minX = 1.9 * 6  / 14;
+    //maxX = 1.9 * 10 / 14;
+}
+
 void drawMagic(int cx, int y)
 {
     blendCircle(ringColour, float(cx), float(y - 1), ringRadius, false);
@@ -213,20 +410,17 @@ void drawMagic(int cx, int y)
 //  Initialization
 //==============================================================================
 
-
 void initialise()
 {
     // Lights
     isBlinking = true;
 
     // Magic Ring
-    isMagic = false;
-    ringRadius = 0;
-    
-    // Star location constraints
-    maxY = 1.9 * 3  / 14;
-    minX = 1.9 * 6  / 14;
-    maxX = 1.9 * 10 / 14;
+    initMagicRing();
+
+    // Snowfall
+    initSnowFall();
+    resetSnowFall();
 }
 
 //==============================================================================
@@ -237,7 +431,9 @@ void repaint()
 {
     clearDisplay();
     drawBG();
+    if (isSnowing) drawSnowFall(snowColourBG, 4, 8);
     drawTree(7, 2);
+    if (isSnowing) drawSnowFall(snowColourFG, 0, 4);
     //log(getTimeInCurrentFunctionCall());
 }
 
@@ -254,17 +450,17 @@ void handleButtonDown (int index)
 
 //==== Touch ===================================================================
 
-// Star location constraints
-float maxY;
-float minX;
-float maxX;
-
 void touchStart (int index, float x, float y, float z, float vz)
 {
     if ( y < maxY && x > minX && x < maxX )
     {
         isMagic = true;
         ringRadius = 0;     // reset the ring on consequent touch
+    }
+    else
+    {
+        resetSnowFall();
+        isSnowing = !isSnowing;
     }
 }
 
