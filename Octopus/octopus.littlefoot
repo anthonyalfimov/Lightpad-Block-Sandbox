@@ -1,0 +1,90 @@
+
+
+// Colours
+int c_base;
+int c_shadow;
+int c_mouth;
+
+
+void initialise()
+{
+    c_base   = 0x6244E3; //0x8869F3 //0xFF00FF
+    c_shadow = 0x1B133F; //0x6244E3
+    c_mouth  = 0xB3352C; //0xC5554D
+}
+
+// Takes coordinates for the CENTRE of the octopus
+void drawBodyAt(int x, int y)
+{
+    drawBackTentaclesAt(x, y);
+
+//  Body
+//           |  colour|      x|      y|  w|  h|
+    fillRect (  c_base, x -  2, y -  5,  5,  9);
+    fillRect (  c_base, x -  4, y -  3,  9,  5);
+    fillRect (  c_base, x -  3, y -  4,  7,  7);
+
+//  Shadow
+//           |  colour|      x|      y|  w|  h|
+    fillRect (c_shadow, x +  1, y -  5,  2,  1);
+    fillPixel(c_shadow, x +  3, y -  4);
+    fillPixel(c_shadow, x +  4, y -  3);
+
+    drawEyesAt(x, y);
+    drawMouthAt(x, y);
+    drawFrontTentaclesAt(x, y);
+}
+
+void drawEyesAt(int x, int y)
+{
+    for (int dx = -2; dx < 2; dx += 3)
+    {
+        fillRect (0xFFFFFF, x + dx, y - 2, 2, 2);
+        fillPixel(0x000000, x + dx, y - 1);
+    }
+}
+
+void drawMouthAt(int x, int y)
+{
+//           |  colour|      x|      y|  w|  h|
+    fillRect ( c_mouth, x -  1, y +  1,  3,  1);
+    fillRect ( c_mouth, x,      y +  2,  2,  1);
+}
+
+void drawFrontTentaclesAt(int x, int y)
+{
+    // Left
+    fillRect (  c_base, x -  3, y +  4,  3,  1);
+    fillRect (  c_base, x -  5, y +  5,  4,  1);
+    fillRect (  c_base, x -  4, y +  6,  2,  1);
+    fillRect (  c_base, x -  6, y +  4,  2,  1);
+    fillPixel(  c_base, x -  6, y +  3);
+
+    // Right
+    fillRect (  c_base, x +  1, y +  4,  3,  1);
+    fillRect (  c_base, x +  2, y +  5,  4,  1);
+    fillRect (  c_base, x +  3, y +  6,  2,  1);
+    fillRect (  c_base, x +  5, y +  4,  2,  1);
+    fillPixel(  c_base, x +  6, y +  3);
+}
+
+void drawBackTentaclesAt(int x, int y)
+{
+    // Left
+    fillRect (c_shadow, x -  5, y +  3,  4,  1);
+    fillRect (c_shadow, x -  4, y +  4,  2,  1);
+    fillPixel(c_shadow, x -  5, y +  2);
+
+    // Right
+    fillRect (c_shadow, x +  2, y +  3,  4,  1);
+    fillRect (c_shadow, x +  3, y +  4,  2,  1);
+    fillPixel(c_shadow, x +  5, y +  2);
+}
+
+
+
+void repaint()
+{
+    clearDisplay();
+    drawBodyAt(7, 7);
+}
