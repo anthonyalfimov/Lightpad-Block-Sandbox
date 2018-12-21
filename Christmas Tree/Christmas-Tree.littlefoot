@@ -1,11 +1,19 @@
+/*
+<metadata description="Festive Christmas Tree for your Lightpad Block!">
+</metadata>
+*/
+
+
 //==============================================================================
-//  Global State variables
+//  Global State Variables
 //==============================================================================
 bool isBlinking;
 
 //==============================================================================
 //  Drawing Functions
 //==============================================================================
+
+//==== Background ==============================================================
 
 void drawBG()
 {
@@ -19,6 +27,117 @@ void drawBG()
                   14 - i, 0, 1, 15);
     }
 }
+
+//==== Tinsel ===================================================================
+
+void drawTinselLine(int x, int y, int length)
+{
+    for (int i = 0; i < length; i++)
+        blendPixel(makeARGB(40 + getRandomInt(60), 255, 255, 128),
+                   x + i, y + i);
+}
+
+void drawTinsel(int cx, int y)
+{
+    drawTinselLine(cx - 1, y + 2, 4);
+    drawTinselLine(cx - 2, y + 5, 7);
+    drawTinselLine(cx - 3, y + 8, 4);
+}
+
+//==== Lights ===================================================================
+
+// Lights Colour Constants
+const int lightsColour = 0xFF00FFFF;
+
+void drawLightsLine(int x, int y, int num)
+{
+    for (int i = 0; i < num; i++)
+        //blendPixel(lightsColour, x + 2 * i, y + 2 * i);
+        blendCircle(lightsColour, x + 2.0 * i, y + 2.0 * i, 0.01, true);
+}
+
+void drawLights(int cx, int y)
+{
+    if (!isBlinking || (getMillisecondCounter() / 500 % 2 == 0))
+    {
+        drawLightsLine(cx - 1, y + 3, 2);
+        drawLightsLine(cx - 2, y + 6, 3);
+        drawLightsLine(cx - 3, y + 9, 2);
+    }
+}
+
+//==== Baubles ===================================================================
+
+// Bauble Colour Constants
+const int baubleColour = 0xFFFF0000;
+
+void drawBaubles(int cx, int y)
+{
+    blendPixel(baubleColour, cx + 1, y +  3);
+    blendPixel(baubleColour, cx - 1, y +  5);
+    blendPixel(baubleColour, cx + 2, y +  8);
+    blendPixel(baubleColour, cx - 2, y + 10);
+}
+
+//==== Star ======================================================================
+
+// Star Colour & glow Variables
+int starColour;             // colour of the star
+int illumColour;            // colour of tree illuminated by the star
+int glowColour1;            // primary glow colour
+int glowColour2;            // secondaty glow colour
+int glowValue;              // source of glow pulse
+
+// Star Colour & glow Constants
+const int glowPeriod = 12;  // period of glow pulse (x 256 ms)
+
+void drawStar(int cx, int y)
+{
+    // Glow pulse rate
+    // Triangle wave with values in [0 - 128]
+    glowValue = abs((getMillisecondCounter() / glowPeriod) % 257 - 128);
+    
+    // Centre
+    blendPixel(0xFFFFFFFF, cx,     y - 1);
+
+    // Star
+    starColour = makeARGB(200 + glowValue * 55 / 128, 255, 220, 0);
+    
+    blendPixel(starColour, cx,     y - 2);
+    blendPixel(starColour, cx - 1, y - 1);
+    blendPixel(starColour, cx + 1, y - 1);
+    
+    // Tree illumination
+    illumColour = makeARGB(60 + glowValue * 32 / 128, 255, 255, 0);
+    
+    blendPixel(illumColour, cx,     y);
+
+    // Primary Glow
+    glowColour1 = makeARGB(8 + glowValue * 24 / 128, 255, 255, 0);
+    
+    blendPixel(glowColour1, cx - 1, y - 2);
+    blendPixel(glowColour1, cx + 1, y - 2);
+
+    blendPixel(glowColour1, cx - 1, y);
+    blendPixel(glowColour1, cx + 1, y);
+
+    blendPixel(glowColour1, cx - 2, y - 1);
+    blendPixel(glowColour1, cx + 2, y - 1);
+
+    // Secondary Glow
+    glowColour2 = makeARGB(glowValue * 6 / 128, 255, 200, 0 );
+    
+    blendPixel(glowColour2, cx - 2, y - 2);
+    blendPixel(glowColour2, cx + 2, y - 2);
+
+    blendPixel(glowColour2, cx - 2, y);
+    blendPixel(glowColour2, cx + 2, y);
+
+    blendPixel(glowColour2, cx - 3, y - 1);
+    blendPixel(glowColour2, cx + 3, y - 1);
+}
+
+//==== Tree ======================================================================
 
 /**
 @param rgb    colour to use
@@ -40,67 +159,7 @@ void drawTreeSegment(int rgb, int cx, int y, int levels)
     }
 }
 
-void drawTinselLine(int x, int y, int length)
-{
-    for (int i = 0; i < length; i++)
-        blendPixel(makeARGB(40 + getRandomInt(60), 255, 255, 0),
-                   x + i, y + i);
-}
-
-void drawTinsel(int cx, int y)
-{
-    drawTinselLine(cx - 1, y + 2, 4);
-    drawTinselLine(cx - 2, y + 5, 7);
-    drawTinselLine(cx - 3, y + 8, 4);
-}
-
-void drawLightsLine(int x, int y, int num)
-{
-    for (int i = 0; i < num; i++)
-        blendPixel(0xFF00FFFF, x + 2 * i, y + 2 * i);
-}
-
-void drawLights(int cx, int y)
-{
-    if (!isBlinking || (getMillisecondCounter() / 500 % 2 == 0))
-    {
-        drawLightsLine(cx - 1, y + 3, 2);
-        drawLightsLine(cx - 2, y + 6, 3);
-        drawLightsLine(cx - 3, y + 9, 2);
-    }
-}
-
-void drawBaubles(int cx, int y)
-{
-    blendPixel(0xFFFF0000, cx + 1, y +  3);
-    blendPixel(0xFFFF0000, cx - 1, y +  5);
-    blendPixel(0xFFFF0000, cx + 2, y +  8);
-    blendPixel(0xFFFF0000, cx - 2, y + 10);
-}
-
-void drawStar(int cx, int y)
-{
-    // Centre
-    blendPixel(0xFFFFFFFF, cx,     y - 1);
-    
-    // Star
-    blendPixel(0xFFFFFF00, cx,     y - 2);
-    blendPixel(0xFFFFFF00, cx - 1, y - 1);
-    blendPixel(0xFFFFFF00, cx + 1, y - 1);
-    
-    // Glow
-    blendPixel(0x60FFFF00, cx, y);
-    
-    blendPixel(0x20FFFF00, cx - 1, y - 2);
-    blendPixel(0x20FFFF00, cx + 1, y - 2);
-    
-    blendPixel(0x20FFFF00, cx - 1, y);
-    blendPixel(0x20FFFF00, cx + 1, y);
-    
-    blendPixel(0x20FFFF00, cx - 2, y - 1);
-    blendPixel(0x20FFFF00, cx + 2, y - 1);
-}
-
+// Tree Colour Constants
 const int treeColourMain   = 0x00FF00;
 const int treeColourAccent = 0x004000;
 /**
@@ -133,14 +192,19 @@ void drawTree(int cx, int y)
 
 void initialise()
 {
-    isBlinking = false;
+    isBlinking = true;
 }
+
+//==============================================================================
+//  Repaint
+//==============================================================================
 
 void repaint()
 {
     clearDisplay();
     drawBG();
     drawTree(7, 2);
+    //log(getTimeInCurrentFunctionCall());
 }
 
 //==============================================================================
@@ -152,3 +216,106 @@ void handleButtonDown (int index)
 {
     isBlinking = !isBlinking;
 }
+
+
+/*
+<display backgroundColour="0xFF83DD79" textColour ="0xFF000000">
+    <pixels>
+        <pixel index="3" colour="0xFF00FF00" />
+        <pixel index="4" colour="0xFF00FF00" />
+        <pixel index="6" colour="0xFF301D00" />
+        <pixel index="7" colour="0xFF4E2F01" />
+        <pixel index="8" colour="0xFF301D00" />
+        <pixel index="10" colour="0xFF00FF00" />
+        <pixel index="11" colour="0xFF00FF00" />
+        <pixel index="17" colour="0xFF00A000" />
+        <pixel index="18" colour="0xFF00A000" />
+        <pixel index="19" colour="0xFF00FF00" />
+        <pixel index="20" colour="0xFF00FF00" />
+        <pixel index="21" colour="0xFF00FFFF" />
+        <pixel index="22" colour="0xFFFFFF00" />
+        <pixel index="23" colour="0xFF00A000" />
+        <pixel index="24" colour="0xFF00FF00" />
+        <pixel index="25" colour="0xFF00FF00" />
+        <pixel index="26" colour="0xFFFFFF00" />
+        <pixel index="27" colour="0xFF00A000" />
+        <pixel index="33" colour="0xFF00A000" />
+        <pixel index="34" colour="0xFF00A000" />
+        <pixel index="35" colour="0xFFFF0000" />
+        <pixel index="36" colour="0xFFFFFF00" />
+        <pixel index="37" colour="0xFF00A000" />
+        <pixel index="38" colour="0xFF00FF00" />
+        <pixel index="39" colour="0xFF00FFFF" />
+        <pixel index="40" colour="0xFFFFFF00" />
+        <pixel index="41" colour="0xFF00A000" />
+        <pixel index="49" colour="0xFF00FFFF" />
+        <pixel index="50" colour="0xFFFFFF00" />
+        <pixel index="51" colour="0xFF00FF00" />
+        <pixel index="52" colour="0xFF00FF00" />
+        <pixel index="53" colour="0xFF00FF00" />
+        <pixel index="54" colour="0xFFFFFF00" />
+        <pixel index="55" colour="0xFF00A000" />
+        <pixel index="63" colour="0xFF00FF00" />
+        <pixel index="64" colour="0xFFFFFF00" />
+        <pixel index="65" colour="0xFF00A000" />
+        <pixel index="66" colour="0xFF00A000" />
+        <pixel index="67" colour="0xFF00FFFF" />
+        <pixel index="68" colour="0xFFFFFF00" />
+        <pixel index="69" colour="0xFFFF0000" />
+        <pixel index="70" colour="0xFF00FF00" />
+        <pixel index="71" colour="0xFF00FF00" />
+        <pixel index="79" colour="0xFF00FF00" />
+        <pixel index="80" colour="0xFF00FF00" />
+        <pixel index="81" colour="0xFF00A000" />
+        <pixel index="82" colour="0xFFFFFF00" />
+        <pixel index="83" colour="0xFF00A000" />
+        <pixel index="84" colour="0xFF00FF00" />
+        <pixel index="85" colour="0xFF00FF00" />
+        <pixel index="95" colour="0xFF00FFFF" />
+        <pixel index="96" colour="0xFFFFFF00" />
+        <pixel index="97" colour="0xFF00A000" />
+        <pixel index="98" colour="0xFF00FF00" />
+        <pixel index="99" colour="0xFF00FF00" />
+        <pixel index="109" colour="0xFF00A000" />
+        <pixel index="110" colour="0xFFFFFF00" />
+        <pixel index="111" colour="0xFFFF0000" />
+        <pixel index="112" colour="0xFF00FF00" />
+        <pixel index="113" colour="0xFF00FFFF" />
+        <pixel index="114" colour="0xFFFFFF00" />
+        <pixel index="115" colour="0xFF00A000" />
+        <pixel index="125" colour="0xFF00A000" />
+        <pixel index="126" colour="0xFF00A000" />
+        <pixel index="127" colour="0xFF00FF00" />
+        <pixel index="128" colour="0xFFFFFF00" />
+        <pixel index="129" colour="0xFF00A000" />
+        <pixel index="141" colour="0xFF00FFFF" />
+        <pixel index="142" colour="0xFFFFFF00" />
+        <pixel index="143" colour="0xFFFF0000" />
+        <pixel index="155" colour="0xFF00FF00" />
+        <pixel index="156" colour="0xFFFFFF00" />
+        <pixel index="157" colour="0xFF00A000" />
+        <pixel index="158" colour="0xFF00FF00" />
+        <pixel index="159" colour="0xFF00FF00" />
+        <pixel index="171" colour="0xFF00FF00" />
+        <pixel index="172" colour="0xFF00FF00" />
+        <pixel index="173" colour="0xFF00FF00" />
+        <pixel index="185" colour="0x10FFC800" />
+        <pixel index="186" colour="0x70FFC800" />
+        <pixel index="187" colour="0xFF10FB00" />
+        <pixel index="188" colour="0x70FFC800" />
+        <pixel index="189" colour="0x10FFC800" />
+        <pixel index="199" colour="0x10FFC800" />
+        <pixel index="200" colour="0x70FFC800" />
+        <pixel index="201" colour="0xFFFFC800" />
+        <pixel index="202" colour="0xFFFFFFFF" />
+        <pixel index="203" colour="0xFFFFC800" />
+        <pixel index="204" colour="0x70FFC800" />
+        <pixel index="205" colour="0x10FFC800" />
+        <pixel index="215" colour="0x10FFC800" />
+        <pixel index="216" colour="0x70FFC800" />
+        <pixel index="217" colour="0xFFFFC800" />
+        <pixel index="218" colour="0x70FFC800" />
+        <pixel index="219" colour="0x10FFC800" />
+    </pixels>
+</display>
+*/
