@@ -1,5 +1,44 @@
 /*
-<metadata description="Festive Christmas Tree for your Lightpad Block!">
+<metadata   description="Festive Christmas Tree for your Lightpad Block!"
+            target="Lightpad"
+            tags="Fun;">
+    <variables>
+        <vector count="8" wantsGetFunctions="true" wantsSetFunctions="true">
+            <variable   name="SnowY"
+                        type="float"
+                        min="-15.0"
+                        max="15.0"
+                        value="0.0"
+                        visible="false" />
+        </vector>
+
+        <vector count="8" wantsGetFunctions="true" wantsSetFunctions="true">
+            <variable   name="SnowY0"
+                        type="float"
+                        min="-15.0"
+                        max="15.0"
+                        value="-1.0"
+                        visible="false" />
+        </vector>
+
+        <vector count="8" wantsGetFunctions="true" wantsSetFunctions="true">
+            <variable   name="SnowX0"
+                        type="float"
+                        min="-1.0"
+                        max="15.0"
+                        value="0.0"
+                        visible="false" />
+        </vector>
+
+        <vector count="8" wantsGetFunctions="true" wantsSetFunctions="true">
+            <variable   name="SnowPh"
+                        type="int"
+                        min="0"
+                        max="200"
+                        value="0"
+                        visible="false" />
+        </vector>
+    </variables>
 </metadata>
 */
 
@@ -8,6 +47,7 @@
 //==============================================================================
 bool isBlinking;        // Lights blinking or always on
 bool isMagic;           // Magic is happenning or not
+bool isSnowing;
 
 //==============================================================================
 //  Drawing Functions
@@ -28,12 +68,276 @@ void drawBG()
     }
 }
 
+//==== Snow ====================================================================
+
+//======== SnowFall ============================================================
+
+// SnowFall Constants
+const float snowRate   = 0.07;      // rate of snowfall                | d: 0.07
+const float snowSize   = 0.01;      // snowflake size                  | d: 0.01
+const int   snowPeriod = 20;        // period of sideways oscillations | d: 20
+
+// SnowFall Alpha Constants
+const int snowAlphaFG = 0xFF;
+const int snowAlphaBG = 0x18;
+
+// SnowFall Fade-out Constants
+const int maxSnowFallFrames = snowAlphaFG;
+const int snowFallFadeRateFast = 16;
+const int snowFallFadeRateSlow = 4;
+const int snowFallFadeThresh = 0x40;    // threshold for switch from fast to slow
+
+// SnowFall Colour Variables
+int snowColourFG;
+int snowColourBG;
+
+//const int snowColourMG = 0x40FFFFFF;
+//const int snowColourBBG = 0x08FFFFFF;
+
+// SnowFall Fade-out Variables
+int snowFallFrames;
+
+// Temporary snowflake coordinate variables
+float snowX, snowY;
+int   snowPh;
+
+void initSnowFall()
+{
+    // Snowflake initial positions
+
+    // Foreground
+    // left
+    setSnowX0(0,  0.5);
+    setSnowY0(0, -1.0);
+    setSnowPh(0,  20);
+    // left
+    setSnowX0(1,  3.0);
+    setSnowY0(1, -8.0);
+    setSnowPh(1,  110);
+    // right
+    setSnowX0(2,  12.0);
+    setSnowY0(2, -3.5);
+    setSnowPh(2,  0);
+    // right
+    setSnowX0(3,  11.0);
+    setSnowY0(3, -12.0);
+    setSnowPh(3,  90);
+
+    // Background
+
+    // left
+    setSnowX0(4,  0.0);
+    setSnowY0(4, -5.0);
+    setSnowPh(4,  180);
+    // left
+    setSnowX0(5,  1.5);
+    setSnowY0(5, -12.5);
+    setSnowPh(5,  130);
+    // right
+    setSnowX0(6,  13.0);
+    setSnowY0(6, -9.0);
+    setSnowPh(6,  150);
+    // right
+    setSnowX0(7,  10.0);
+    setSnowY0(7,  0.0);
+    setSnowPh(7,  50);
+
+    isSnowing = false;
+}
+
+void resetSnowFall()
+{
+    // Reset Snowflake Positions
+    for (int i = 0; i < 8; i++)
+    {
+        snowY = getSnowY0(i);
+        setSnowY(i, snowY);
+    }
+
+    // Reset Snowflake colours
+    snowColourFG = makeARGB(snowAlphaFG, 255, 255, 255);
+    snowColourBG = makeARGB(snowAlphaBG, 255, 255, 255);
+}
+
+// returns float offset in [0, 1], takes in phase shift
+float snowFallOffset(int phase)
+{
+    return abs( (getMillisecondCounter() / snowPeriod + phase) % 201 - 100 ) / 100.0;
+}
+
+void drawSnowFall(int argb, int start, int end)
+{
+    for (int i = start; i < end; i++)
+    {
+        snowPh = getSnowPh(i);
+        snowX  = getSnowX0(i) + 2.0 * snowFallOffset(snowPh);
+        snowY  = getSnowY(i);
+
+        // Draw snowflake
+        blendCircle(argb, snowX, snowY, snowSize, true);
+
+        // Update snowflake position
+        snowY += snowRate;
+        if (snowY > 15.06)
+            setSnowY(i, 0.0);
+        else
+            setSnowY(i, snowY);
+    }
+}
+
+//======== Snow Accumulation ===================================================
+
+// Snow Constants
+// > Rates
+const float snowPileRate = 0.1;
+const float snowMeltRate = 0.5;
+
+// > Snow Layer Parameters
+const int snowAlphaL0 =  0x60;
+const int snowDelayL0 = -0x14;
+
+const int snowAlphaL1 =  0x40;
+const int snowDelayL1 = -0x1B;
+
+const int snowAlphaL2 =  0x18;
+const int snowDelayL2 = -0x28;
+
+const int snowAlphaL3 =  0x08;
+const int snowDelayL3 = -0x38;
+
+// Snow Animation Variables
+float snowFrames;
+int maxSnowFrames;
+
+// Snow Colour variables
+int snowColourL0;
+int snowColourL1;
+int snowColourL2;
+int snowColourL3;
+
+void initSnow()
+{
+    snowFrames = 0.0;
+
+    // Set to the max required duration based on target alphas and offsets
+    maxSnowFrames = max(
+        max(
+            (snowAlphaL0 - snowDelayL0),
+            (snowAlphaL1 - snowDelayL1)
+        ),
+        max(
+            (snowAlphaL2 - snowDelayL2),
+            (snowAlphaL3 - snowDelayL3)
+        )
+    );
+}
+
+void drawSnow(int cx, int y)
+{
+    // Update colours - Could really move these into an array
+    snowColourL0 = makeARGB(
+        clamp(0, snowAlphaL0, int(snowFrames) + snowDelayL0),
+        255, 255, 255
+    );
+
+    snowColourL1 = makeARGB(
+        clamp(0, snowAlphaL1, int(snowFrames) + snowDelayL1),
+        255, 255, 255
+    );
+
+    snowColourL2 = makeARGB(
+        clamp(0, snowAlphaL2, int(snowFrames) + snowDelayL2),
+        255, 255, 255
+    );
+
+    snowColourL3 = makeARGB(
+        clamp(0, snowAlphaL3, int(snowFrames) + snowDelayL3),
+        255, 255, 255
+    );
+
+
+    blendPixel(snowColourL3, cx - 2, y + 1);
+    blendPixel(snowColourL3, cx + 2, y + 1);
+
+    blendPixel(snowColourL1, cx - 2, y + 3);
+
+    blendPixel(snowColourL1, cx - 3, y + 4);
+    blendPixel(snowColourL2, cx + 3, y + 4);
+
+    blendPixel(snowColourL1, cx + 3, y + 6);
+
+    blendPixel(snowColourL2, cx - 4, y + 7);
+    blendPixel(snowColourL1, cx + 4, y + 7);
+
+    blendPixel(snowColourL1, cx - 4, y + 9);
+
+    blendPixel(snowColourL1, cx - 5, y + 10);
+    blendPixel(snowColourL2, cx + 5, y + 10);
+
+    // Left Pile
+
+    blendPixel(snowColourL1, 0, 13);
+    blendPixel(snowColourL0, 0, 14);
+    blendPixel(snowColourL1, 1, 14);
+
+    blendPixel(snowColourL2, 0, 12);
+    blendPixel(snowColourL2, 1, 13);
+    blendPixel(snowColourL3, 2, 14);
+
+    // Righ Pile
+
+    blendPixel(snowColourL1, 14, 13);
+    blendPixel(snowColourL0, 14, 14);
+    blendPixel(snowColourL1, 13, 14);
+
+    blendPixel(snowColourL3, 12, 14);
+    blendPixel(snowColourL2, 13, 13);
+    blendPixel(snowColourL2, 14, 12);
+}
+
+//======== General Snow Functions ==============================================
+
+void updateSnow()
+{
+    if (isSnowing)
+    {
+        // Update Snow Accumulation Parameters
+        if (snowFrames < maxSnowFrames)
+            snowFrames += snowPileRate;
+    }
+    else
+    {
+        // Update Snow Accumulation Parameters
+        if (snowFrames > 0.0)
+            snowFrames -= snowMeltRate;
+
+        // Update SnowFall Fade-out Parameters
+        if (snowFallFrames > 0)
+        {
+            if (snowFallFrames > snowFallFadeThresh)
+                snowFallFrames -= snowFallFadeRateFast;
+            else
+                snowFallFrames -= snowFallFadeRateSlow;
+            
+            snowColourFG = makeARGB(
+                clamp(0, snowAlphaFG, snowFallFrames),
+                255, 255, 255
+            );
+
+            snowColourBG = makeARGB(
+                clamp(0, snowAlphaBG, snowFallFrames),
+                255, 255, 255
+            );
+        }
+    }
+}
+
 //==== Tinsel ==================================================================
 
 void drawTinselLine(int x, int y, int length)
 {
     for (int i = 0; i < length; i++)
-        blendPixel(makeARGB(40 + getRandomInt(60), 255, 255, 128),
+        blendPixel(makeARGB(40 + getRandomInt(60), 255, 255, 0),
                    x + i, y + i);
 }
 
@@ -161,13 +465,14 @@ void drawTreeSegment(int rgb, int cx, int y, int levels)
 
 // Tree Colour Constants
 const int treeColourMain   = 0x00FF00;
-const int treeColourAccent = 0x004000;
+const int treeColourAccent = 0x003000;  //0x002000 - 0x004000
 /**
 @param cx     x coordinate of the tree centre
 @param y      y coordinate of the top of the tree
 */
 void drawTree(int cx, int y)
 {
+    // Draw Tree
     drawTreeSegment(treeColourMain,   cx, y,      1);
     drawTreeSegment(treeColourAccent, cx, y + 2,  2);
     drawTreeSegment(treeColourMain,   cx, y + 4,  3);
@@ -179,11 +484,13 @@ void drawTree(int cx, int y)
     fillPixel(0x151000, cx + 1, y + 12);
     fillPixel(0x151000, cx - 1, y + 12);
 
+    // Draw Dependent Elements
     drawTinsel(cx, y);
     drawBaubles(cx, y);
+    if (snowFrames > 0)
+        drawSnow(cx, y);
     drawLights(cx, y);
     drawStar(cx, y);
-
     if (isMagic)
         drawMagic(cx, y);
 }
@@ -197,6 +504,23 @@ const float ringRate = 0.7;             // rate of ring animation
 
 // Magic Ring Variables
 float ringRadius;
+
+// Star location constraints
+const float maxY = 1.9 * 3  / 14;
+const float minX = 1.9 * 6  / 14;
+const float maxX = 1.9 * 10 / 14;
+
+// Initialiser
+void initMagicRing()
+{
+    isMagic = false;
+    ringRadius = 0;
+
+    // Star location constraints
+    //maxY = 1.9 * 3  / 14;
+    //minX = 1.9 * 6  / 14;
+    //maxX = 1.9 * 10 / 14;
+}
 
 void drawMagic(int cx, int y)
 {
@@ -213,20 +537,20 @@ void drawMagic(int cx, int y)
 //  Initialization
 //==============================================================================
 
-
 void initialise()
 {
     // Lights
     isBlinking = true;
 
     // Magic Ring
-    isMagic = false;
-    ringRadius = 0;
-    
-    // Star location constraints
-    maxY = 1.9 * 3  / 14;
-    minX = 1.9 * 6  / 14;
-    maxX = 1.9 * 10 / 14;
+    initMagicRing();
+
+    // SnowFall
+    initSnowFall();
+    resetSnowFall();
+
+    // Snow Accumulation
+    initSnow();
 }
 
 //==============================================================================
@@ -237,7 +561,10 @@ void repaint()
 {
     clearDisplay();
     drawBG();
+    updateSnow();
+    if (snowFallFrames > 0) drawSnowFall(snowColourBG, 4, 8);
     drawTree(7, 2);
+    if (snowFallFrames > 0) drawSnowFall(snowColourFG, 0, 4);
     //log(getTimeInCurrentFunctionCall());
 }
 
@@ -254,23 +581,30 @@ void handleButtonDown (int index)
 
 //==== Touch ===================================================================
 
-// Star location constraints
-float maxY;
-float minX;
-float maxX;
-
 void touchStart (int index, float x, float y, float z, float vz)
 {
+    // If the Star is touched, play Magic Ring animation
     if ( y < maxY && x > minX && x < maxX )
     {
         isMagic = true;
-        ringRadius = 0;     // reset the ring on consequent touch
+        ringRadius = 0;     // reset the ring on consequent touches
+    }
+    // If it is Snowing, stop
+    else if (isSnowing)
+    {
+        isSnowing = false;
+    }
+    // If it isn't snowing, reset snowflake positions and fade-out animation
+    else
+    {
+        resetSnowFall();
+        snowFallFrames = maxSnowFallFrames;
+        isSnowing = true;
     }
 }
 
-
 /*
-<display backgroundColour="0xFF83DD79" textColour ="0xFF000000">
+<display backgroundColour="0xFF00003A" textColour ="0xFFFFC800">
     <pixels>
         <pixel index="3" colour="0xFF00FF00" />
         <pixel index="4" colour="0xFF00FF00" />
