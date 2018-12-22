@@ -77,12 +77,25 @@ const float snowRate   = 0.07;      // rate of snowfall                | d: 0.07
 const float snowSize   = 0.01;      // snowflake size                  | d: 0.01
 const int   snowPeriod = 20;        // period of sideways oscillations | d: 20
 
-// SnowFall Colour Constants
-const int snowColourFG = 0xFFFFFFFF;
-const int snowColourMG = 0x40FFFFFF;
-const int snowColourBG = 0x18FFFFFF;
+// SnowFall Alpha Constants
+const int snowAlphaFG = 0xFF;
+const int snowAlphaBG = 0x18;
 
-const int snowColourBBG = 0x08FFFFFF;
+// SnowFall Fade-out Constants
+const int maxSnowFallFrames = snowAlphaFG;
+const int snowFallFadeRateFast = 16;
+const int snowFallFadeRateSlow = 4;
+const int snowFallFadeThresh = 0x40;    // threshold for switch from fast to slow
+
+// SnowFall Colour Variables
+int snowColourFG;
+int snowColourBG;
+
+//const int snowColourMG = 0x40FFFFFF;
+//const int snowColourBBG = 0x08FFFFFF;
+
+// SnowFall Fade-out Variables
+int snowFallFrames;
 
 // Temporary snowflake coordinate variables
 float snowX, snowY;
@@ -129,16 +142,21 @@ void initSnowFall()
     setSnowY0(7,  0.0);
     setSnowPh(7,  50);
 
-    isSnowing = false; // should be false
+    isSnowing = false;
 }
 
 void resetSnowFall()
 {
+    // Reset Snowflake Positions
     for (int i = 0; i < 8; i++)
     {
         snowY = getSnowY0(i);
         setSnowY(i, snowY);
     }
+
+    // Reset Snowflake colours
+    snowColourFG = makeARGB(snowAlphaFG, 255, 255, 255);
+    snowColourBG = makeARGB(snowAlphaBG, 255, 255, 255);
 }
 
 // returns float offset in [0, 1], takes in phase shift
@@ -171,15 +189,15 @@ void drawSnowFall(int argb, int start, int end)
 
 // Snow Constants
 // > Rates
-const int snowPileRate = 1;
-const int snowMeltRate = snowPileRate;
+const float snowPileRate = 0.1;
+const float snowMeltRate = 0.5;
 
 // > Snow Layer Parameters
-const int snowAlphaL0 =  0xFF;
-const int snowDelayL0 =  0;
+const int snowAlphaL0 =  0x60;
+const int snowDelayL0 = -0x14;
 
 const int snowAlphaL1 =  0x40;
-const int snowDelayL1 =  0;
+const int snowDelayL1 = -0x1B;
 
 const int snowAlphaL2 =  0x18;
 const int snowDelayL2 = -0x28;
@@ -188,7 +206,7 @@ const int snowAlphaL3 =  0x08;
 const int snowDelayL3 = -0x38;
 
 // Snow Animation Variables
-int snowFrames;
+float snowFrames;
 int maxSnowFrames;
 
 // Snow Colour variables
@@ -199,8 +217,8 @@ int snowColourL3;
 
 void initSnow()
 {
-    snowFrames = 0;
-    
+    snowFrames = 0.0;
+
     // Set to the max required duration based on target alphas and offsets
     maxSnowFrames = max(
         max(
@@ -214,37 +232,26 @@ void initSnow()
     );
 }
 
-void updateSnow()
-{
-    if (isSnowing)
-    {
-        if (snowFrames < maxSnowFrames)
-            snowFrames += snowPileRate;
-    }
-    else if (snowFrames > 0)
-        snowFrames -= snowMeltRate;
-}
-
 void drawSnow(int cx, int y)
 {
     // Update colours - Could really move these into an array
     snowColourL0 = makeARGB(
-        clamp(0, snowAlphaL0, snowFrames + snowDelayL0),
+        clamp(0, snowAlphaL0, int(snowFrames) + snowDelayL0),
         255, 255, 255
     );
 
     snowColourL1 = makeARGB(
-        clamp(0, snowAlphaL1, snowFrames + snowDelayL1),
+        clamp(0, snowAlphaL1, int(snowFrames) + snowDelayL1),
         255, 255, 255
     );
 
     snowColourL2 = makeARGB(
-        clamp(0, snowAlphaL2, snowFrames + snowDelayL2),
+        clamp(0, snowAlphaL2, int(snowFrames) + snowDelayL2),
         255, 255, 255
     );
 
     snowColourL3 = makeARGB(
-        clamp(0, snowAlphaL3, snowFrames + snowDelayL3),
+        clamp(0, snowAlphaL3, int(snowFrames) + snowDelayL3),
         255, 255, 255
     );
 
@@ -286,6 +293,43 @@ void drawSnow(int cx, int y)
     blendPixel(snowColourL3, 12, 14);
     blendPixel(snowColourL2, 13, 13);
     blendPixel(snowColourL2, 14, 12);
+}
+
+//======== General Snow Functions ==============================================
+
+void updateSnow()
+{
+    if (isSnowing)
+    {
+        // Update Snow Accumulation Parameters
+        if (snowFrames < maxSnowFrames)
+            snowFrames += snowPileRate;
+    }
+    else
+    {
+        // Update Snow Accumulation Parameters
+        if (snowFrames > 0.0)
+            snowFrames -= snowMeltRate;
+
+        // Update SnowFall Fade-out Parameters
+        if (snowFallFrames > 0)
+        {
+            if (snowFallFrames > snowFallFadeThresh)
+                snowFallFrames -= snowFallFadeRateFast;
+            else
+                snowFallFrames -= snowFallFadeRateSlow;
+            
+            snowColourFG = makeARGB(
+                clamp(0, snowAlphaFG, snowFallFrames),
+                255, 255, 255
+            );
+
+            snowColourBG = makeARGB(
+                clamp(0, snowAlphaBG, snowFallFrames),
+                255, 255, 255
+            );
+        }
+    }
 }
 
 //==== Tinsel ==================================================================
@@ -421,7 +465,7 @@ void drawTreeSegment(int rgb, int cx, int y, int levels)
 
 // Tree Colour Constants
 const int treeColourMain   = 0x00FF00;
-const int treeColourAccent = 0x004000;
+const int treeColourAccent = 0x003000;  //0x002000 - 0x004000
 /**
 @param cx     x coordinate of the tree centre
 @param y      y coordinate of the top of the tree
@@ -504,7 +548,7 @@ void initialise()
     // SnowFall
     initSnowFall();
     resetSnowFall();
-    
+
     // Snow Accumulation
     initSnow();
 }
@@ -518,9 +562,9 @@ void repaint()
     clearDisplay();
     drawBG();
     updateSnow();
-    if (isSnowing) drawSnowFall(snowColourBG, 4, 8);
+    if (snowFallFrames > 0) drawSnowFall(snowColourBG, 4, 8);
     drawTree(7, 2);
-    if (isSnowing) drawSnowFall(snowColourFG, 0, 4);
+    if (snowFallFrames > 0) drawSnowFall(snowColourFG, 0, 4);
     //log(getTimeInCurrentFunctionCall());
 }
 
@@ -539,21 +583,28 @@ void handleButtonDown (int index)
 
 void touchStart (int index, float x, float y, float z, float vz)
 {
+    // If the Star is touched, play Magic Ring animation
     if ( y < maxY && x > minX && x < maxX )
     {
         isMagic = true;
-        ringRadius = 0;     // reset the ring on consequent touch
+        ringRadius = 0;     // reset the ring on consequent touches
     }
+    // If it is Snowing, stop
+    else if (isSnowing)
+    {
+        isSnowing = false;
+    }
+    // If it isn't snowing, reset snowflake positions and fade-out animation
     else
     {
         resetSnowFall();
-        isSnowing = !isSnowing;
+        snowFallFrames = maxSnowFallFrames;
+        isSnowing = true;
     }
 }
 
-
 /*
-<display backgroundColour="0xFF83DD79" textColour ="0xFF000000">
+<display backgroundColour="0xFF00003A" textColour ="0xFFFFC800">
     <pixels>
         <pixel index="3" colour="0xFF00FF00" />
         <pixel index="4" colour="0xFF00FF00" />
