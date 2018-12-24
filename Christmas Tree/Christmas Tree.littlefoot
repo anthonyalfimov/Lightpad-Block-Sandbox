@@ -1,7 +1,8 @@
 /*
-<metadata   description="Festive Christmas Tree for your Lightpad Block!"
+<metadata   description="Festive Christmas Tree for your Lightpad Block"
+            details="Tap the block anywhere except for the Star to make it snow! Tap again to melt the snow away. Tap the Star to see it shine! The Mode button controls blinking of the lights."
             target="Lightpad"
-            tags="Fun;">
+            tags="Fun" canEmbedModes="false">
     <variables>
         <vector count="8" wantsGetFunctions="true" wantsSetFunctions="true">
             <variable   name="SnowY"
@@ -90,9 +91,6 @@ const int snowFallFadeThresh = 0x40;    // threshold for switch from fast to slo
 // SnowFall Colour Variables
 int snowColourFG;
 int snowColourBG;
-
-//const int snowColourMG = 0x40FFFFFF;
-//const int snowColourBBG = 0x08FFFFFF;
 
 // SnowFall Fade-out Variables
 int snowFallFrames;
