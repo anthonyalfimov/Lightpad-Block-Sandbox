@@ -1,6 +1,6 @@
 # Christmas Tree App
 
-![Christmas Tree](/Christmas Tree/screenshot01.png)
+![Christmas Tree](screenshot01.png)
 
 Festive Christmas Tree for your Lightpad Block.
 
