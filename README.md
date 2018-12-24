@@ -18,7 +18,7 @@ Experiments with Littlefoot scripts for ROLI Lightpad Block.
 
 ### Christmas Tree
 
-![Christmas Tree](/Christmas\ Tree/screenshot01.png "Christmas Tree")
+![Christmas Tree](Christmas%20Tree/screenshot01.png "Christmas Tree")
 
 Festive Christmas Tree for your Lightpad Block.
 
