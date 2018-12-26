@@ -8,9 +8,11 @@ Experiments with Littlefoot scripts for ROLI Lightpad Block.
 
 1. Clone or download (*Clone or download -> Download ZIP*) the repository to your computer.
 
-2. Copy the scripts you are interested in into `Documents/ROLI/LittleFoot/` (both Win and MacOS).
+2. Make sure you have [ROLI Dashboard](https://roli.com/products/software/blocks-dashboard) installed.
 
-3. Launch ROLI Dashboard and select the app to load it into your Lightpad Block and tweak its parameters ("Edit" button).
+3. Copy the scripts you are interested in into `Documents/ROLI/LittleFoot/` (both Win and MacOS).
+
+4. Launch ROLI Dashboard and select the app to load it into your Lightpad Block and tweak its parameters ("Edit" button).
 
 ---
 
