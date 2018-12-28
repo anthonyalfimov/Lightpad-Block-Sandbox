@@ -12,8 +12,10 @@ The Mode button controls blinking of the lights.
 
 ## Installation
 
-1. Clone or download (Clone or download -> Download ZIP) the whole repository to your computer.
+1. Clone or download (*Clone or download -> Download ZIP*) the whole repository to your computer.
 
-2. Copy the Littlefoot script `Christmas Tree/Christmas Tree.littlefoot`  into `Documents/ROLI/LittleFoot/` (both Win and MacOS).
+2. Make sure you have [ROLI Dashboard](https://roli.com/products/software/blocks-dashboard) installed.
 
-3. Launch ROLI Dashboard and select the Christmas Tree app to load it into your Lightpad Block.
+3. Copy the Littlefoot script `Christmas Tree/Christmas Tree.littlefoot`  into `Documents/ROLI/LittleFoot/` (both Win and MacOS).
+
+4. Launch ROLI Dashboard and select the Christmas Tree app to load it into your Lightpad Block.
