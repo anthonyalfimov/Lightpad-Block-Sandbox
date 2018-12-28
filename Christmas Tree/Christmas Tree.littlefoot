@@ -621,7 +621,7 @@ void touchEnd (int index, float x, float y, float z, float vz)
 }
 
 /*
-<display backgroundColour="0xFF00003A" textColour ="0xFFFFC800">
+<display backgroundColour="0xFF202040" textColour ="0xFFFFC800">
     <pixels>
         <pixel index="3" colour="0xFF00FF00" />
         <pixel index="4" colour="0xFF00FF00" />
