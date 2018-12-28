@@ -46,9 +46,9 @@
 //==============================================================================
 //  Global State Variables
 //==============================================================================
-bool isBlinking;        // Lights blinking or always on
-bool isMagic;           // Magic is happenning or not
-bool isSnowing;
+bool isBlinking;        // ligths blinking / always on
+bool isMagic;           // starshine animation playing / not playing
+bool isSnowing;         // snowing / not snowing
 
 //==============================================================================
 //  Drawing Functions
@@ -58,8 +58,6 @@ bool isSnowing;
 
 void drawBG()
 {
-    // Simple programmatical BG without "shimmer"
-
     for (int i = 0; i < 5; i++)
     {
         blendRect(makeARGB(25 - 5 * i, 0, 0, 255),
@@ -86,7 +84,7 @@ const int snowAlphaBG = 0x18;
 const int maxSnowFallFrames = snowAlphaFG;
 const int snowFallFadeRateFast = 16;
 const int snowFallFadeRateSlow = 4;
-const int snowFallFadeThresh = 0x40;    // threshold for switch from fast to slow
+const int snowFallFadeThresh = 0x40;   // threshold for switch from fast to slow
 
 // SnowFall Colour Variables
 int snowColourFG;
@@ -232,7 +230,7 @@ void initSnow()
 
 void drawSnow(int cx, int y)
 {
-    // Update colours - Could really move these into an array
+    // Update colours
     snowColourL0 = makeARGB(
         clamp(0, snowAlphaL0, int(snowFrames) + snowDelayL0),
         255, 255, 255
@@ -282,7 +280,7 @@ void drawSnow(int cx, int y)
     blendPixel(snowColourL2, 1, 13);
     blendPixel(snowColourL3, 2, 14);
 
-    // Righ Pile
+    // Right Pile
 
     blendPixel(snowColourL1, 14, 13);
     blendPixel(snowColourL0, 14, 14);
@@ -316,7 +314,7 @@ void updateSnow()
                 snowFallFrames -= snowFallFadeRateFast;
             else
                 snowFallFrames -= snowFallFadeRateSlow;
-            
+
             snowColourFG = makeARGB(
                 clamp(0, snowAlphaFG, snowFallFrames),
                 255, 255, 255
@@ -442,10 +440,10 @@ void drawStar(int cx, int y)
 //==== Tree ====================================================================
 
 /**
-@param rgb    colour to use
-@param cx     x coordinate of the segment centre
-@param y      y coordinate of the top of the segment
-@param levels number of steps to draw below the triangular top
+    rgb    - colour to use
+    cx     - x coordinate of the segment centre
+    y      - y coordinate of the top of the segment
+    levels - number of steps to draw below the triangular top
 */
 void drawTreeSegment(int rgb, int cx, int y, int levels)
 {
@@ -465,8 +463,8 @@ void drawTreeSegment(int rgb, int cx, int y, int levels)
 const int treeColourMain   = 0x00FF00;
 const int treeColourAccent = 0x003000;  //0x002000 - 0x004000
 /**
-@param cx     x coordinate of the tree centre
-@param y      y coordinate of the top of the tree
+    cx - x coordinate of the tree centre
+    y  - y coordinate of the top of the tree
 */
 void drawTree(int cx, int y)
 {
@@ -513,11 +511,6 @@ void initMagicRing()
 {
     isMagic = false;
     ringRadius = 0;
-
-    // Star location constraints
-    //maxY = 1.9 * 3  / 14;
-    //minX = 1.9 * 6  / 14;
-    //maxX = 1.9 * 10 / 14;
 }
 
 void drawMagic(int cx, int y)
