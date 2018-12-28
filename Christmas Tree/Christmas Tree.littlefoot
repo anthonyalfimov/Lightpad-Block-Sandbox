@@ -1,9 +1,18 @@
 /*
 <metadata   description="Festive Christmas Tree for your Lightpad Block"
-            details="Tap the block anywhere except for the Star to make it snow! Tap again to melt the snow away. Tap the Star to see it shine! The Mode button controls blinking of the lights."
+            details="Tap the block anywhere except for the Star to make it snow!
+                     Tap again to melt the snow away. Tap the Star to see it
+                     shine! The Mode button controls blinking of the lights."
             target="Lightpad"
             tags="Fun" canEmbedModes="false">
     <variables>
+        <variable name="channel" displayName="MIDI Channel"
+                  type="int" min="1" max="16" value="1" displayMode="stepper"
+                  tooltip="The MIDI channel that the note is sent on" />
+        <variable name="note" displayName="Note"
+                  type="midiNote" value="C3" initStart="60"
+                  tooltip="The note that will be sent when hitting the Star" />
+
         <vector count="8" wantsGetFunctions="true" wantsSetFunctions="true">
             <variable   name="SnowY"
                         type="float"
@@ -515,6 +524,13 @@ void drawMagic(int cx, int y)
 }
 
 //==============================================================================
+//  MIDI Functions
+//==============================================================================
+
+// Touch index associated with the Star
+int starIndex;      // 0 if no touch is associated with the Star
+
+//==============================================================================
 //  Initialization
 //==============================================================================
 
@@ -532,6 +548,10 @@ void initialise()
 
     // Snow Accumulation
     initSnow();
+
+    // Disable Local Configs as long as we don't use them
+    for (int i = 0; i < 32; ++i)
+        setLocalConfigActiveState (i, false, false);
 }
 
 //==============================================================================
@@ -564,9 +584,15 @@ void handleButtonDown (int index)
 
 void touchStart (int index, float x, float y, float z, float vz)
 {
-    // If the Star is touched, play Magic Ring animation
+    // If the Star is touched, send MIDI note and play Magic Ring animation
     if ( y < maxY && x > minX && x < maxX )
     {
+        // Send MIDI note
+        int velocity = clamp(1, 127, int(vz * 127.0));
+        sendNoteOn((channel - 1), note, velocity);
+        starIndex = index;
+
+        // Start animation
         isMagic = true;
         ringRadius = 0;     // reset the ring on consequent touches
     }
@@ -581,6 +607,16 @@ void touchStart (int index, float x, float y, float z, float vz)
         resetSnowFall();
         snowFallFrames = maxSnowFallFrames;
         isSnowing = true;
+    }
+}
+
+void touchEnd (int index, float x, float y, float z, float vz)
+{
+    if (index == starIndex)
+    {
+        int velocity = clamp(0, 127, int(vz * 127.0));
+        sendNoteOff((channel - 1), note, velocity);
+        starIndex = 0;      // reset the touch index associated with the Star
     }
 }
 
