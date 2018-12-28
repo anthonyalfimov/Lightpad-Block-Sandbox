@@ -1,17 +1,28 @@
 /*
-<metadata   description="Festive Christmas Tree for your Lightpad Block"
-            details="Tap the block anywhere except for the Star to make it snow!
-                     Tap again to melt the snow away. Tap the Star to see it
-                     shine! The Mode button controls blinking of the lights."
+<metadata   description="Festive Christmas Tree MIDI controller for your Lightpad Block"
+            details="Tap the Star to make it shine and play the specified note.&#13;Tap the block anywhere else to make it snow (and toggle the specified MIDI CC to ON).&#13;Tap again to melt the snow away (and toggle MIDI CC to OFF).&#13;The Mode button controls the blinking of the lights."
             target="Lightpad"
             tags="Fun" canEmbedModes="false">
+
+    <groups>
+        <group name="star" displayName="Star" />
+        <group name="snow" displayName="Snowfall Toggle" />
+    </groups>
+
     <variables>
-        <variable name="channel" displayName="MIDI Channel"
+        <variable name="channelStar" displayName="MIDI Channel" group="star"
                   type="int" min="1" max="16" value="1" displayMode="stepper"
                   tooltip="The MIDI channel that the note is sent on" />
-        <variable name="note" displayName="Note"
+        <variable name="noteStar" displayName="Note" group="star"
                   type="midiNote" value="C3" initStart="60"
                   tooltip="The note that will be sent when hitting the Star" />
+
+        <variable name="channelSnow" displayName="MIDI Channel" group="snow"
+                  type="int" min="1" max="16" value="1" displayMode="stepper"
+                  tooltip="The MIDI channel that the CC toggle is sent on" />
+        <variable name="ccSnow" displayName="CC" group="snow"
+                  type="int" min="0" max="127" value="102" initStart="102"
+                  tooltip="The CC that will be toggled by the Snowfall" />
 
         <vector count="8" wantsGetFunctions="true" wantsSetFunctions="true">
             <variable   name="SnowY"
@@ -566,6 +577,11 @@ void repaint()
     if (snowFallFrames > 0) drawSnowFall(snowColourBG, 4, 8);
     drawTree(7, 2);
     if (snowFallFrames > 0) drawSnowFall(snowColourFG, 0, 4);
+    
+    // Draw snowfall toggle indication
+    drawPressureMap();
+    fadePressureMap();
+    
     //log(getTimeInCurrentFunctionCall());
 }
 
@@ -589,24 +605,36 @@ void touchStart (int index, float x, float y, float z, float vz)
     {
         // Send MIDI note
         int velocity = clamp(1, 127, int(vz * 127.0));
-        sendNoteOn((channel - 1), note, velocity);
+        sendNoteOn((channelStar - 1), noteStar, velocity);
         starIndex = index;
 
         // Start animation
         isMagic = true;
         ringRadius = 0;     // reset the ring on consequent touches
     }
-    // If it is Snowing, stop
     else if (isSnowing)
     {
+        // Toggle MIDI CC to OFF
+        sendCC((channelSnow - 1), ccSnow, 0);
+
+        // Stop the snowfall
         isSnowing = false;
+        
+        // Indicate snowfall stop
+        addPressurePoint(0x60FF8040, x * 0.93, y * 0.93, z * 10.0);
     }
-    // If it isn't snowing, reset snowflake positions and fade-out animation
     else
     {
+        // Toggle MIDI CC to ON
+        sendCC((channelSnow - 1), ccSnow, 127);
+
+        // Reset snowflake positions and fade-out animation, start snowfall
         resetSnowFall();
         snowFallFrames = maxSnowFallFrames;
         isSnowing = true;
+        
+        // Indicate snowfall start
+        addPressurePoint(0x608080FF, x * 0.93, y * 0.93, z * 10.0);
     }
 }
 
@@ -615,7 +643,7 @@ void touchEnd (int index, float x, float y, float z, float vz)
     if (index == starIndex)
     {
         int velocity = clamp(0, 127, int(vz * 127.0));
-        sendNoteOff((channel - 1), note, velocity);
+        sendNoteOff((channelStar - 1), noteStar, velocity);
         starIndex = 0;      // reset the touch index associated with the Star
     }
 }
