@@ -535,7 +535,7 @@ void drawMagic(int cx, int y)
 }
 
 //==============================================================================
-//  MIDI Functions
+//  MIDI
 //==============================================================================
 
 // Touch index associated with the Star
@@ -621,7 +621,7 @@ void touchStart (int index, float x, float y, float z, float vz)
         isSnowing = false;
         
         // Indicate snowfall stop
-        addPressurePoint(0x60FF8040, x * 0.93, y * 0.93, z * 10.0);
+        addPressurePoint(0x60FF8040, x * 0.93, y * 0.93, 5.0);
     }
     else
     {
@@ -634,7 +634,7 @@ void touchStart (int index, float x, float y, float z, float vz)
         isSnowing = true;
         
         // Indicate snowfall start
-        addPressurePoint(0x608080FF, x * 0.93, y * 0.93, z * 10.0);
+        addPressurePoint(0x608080FF, x * 0.93, y * 0.93, 5.0);
     }
 }
 
