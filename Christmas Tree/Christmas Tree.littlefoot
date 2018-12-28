@@ -86,16 +86,12 @@ const int snowFallFadeRateFast = 16;
 const int snowFallFadeRateSlow = 4;
 const int snowFallFadeThresh = 0x40;   // threshold for switch from fast to slow
 
-// SnowFall Colour Variables
+// SnowFall Global Colour Variables
 int snowColourFG;
 int snowColourBG;
 
-// SnowFall Fade-out Variables
+// SnowFall Global Fade-out Variables
 int snowFallFrames;
-
-// Temporary snowflake coordinate variables
-float snowX, snowY;
-int   snowPh;
 
 void initSnowFall()
 {
@@ -143,6 +139,9 @@ void initSnowFall()
 
 void resetSnowFall()
 {
+    // Temporary snowflake coordinate variable
+    float snowY;
+
     // Reset Snowflake Positions
     for (int i = 0; i < 8; i++)
     {
@@ -163,6 +162,10 @@ float snowFallOffset(int phase)
 
 void drawSnowFall(int argb, int start, int end)
 {
+    // Temporary snowflake coordinate variables
+    float snowX, snowY;
+    int   snowPh;
+
     for (int i = start; i < end; i++)
     {
         snowPh = getSnowPh(i);
@@ -201,15 +204,9 @@ const int snowDelayL2 = -0x28;
 const int snowAlphaL3 =  0x08;
 const int snowDelayL3 = -0x38;
 
-// Snow Animation Variables
+// Snow Animation Global Variables
 float snowFrames;
 int maxSnowFrames;
-
-// Snow Colour variables
-int snowColourL0;
-int snowColourL1;
-int snowColourL2;
-int snowColourL3;
 
 void initSnow()
 {
@@ -230,23 +227,23 @@ void initSnow()
 
 void drawSnow(int cx, int y)
 {
-    // Update colours
-    snowColourL0 = makeARGB(
+    // Update snow colours
+    int snowColourL0 = makeARGB(
         clamp(0, snowAlphaL0, int(snowFrames) + snowDelayL0),
         255, 255, 255
     );
 
-    snowColourL1 = makeARGB(
+    int snowColourL1 = makeARGB(
         clamp(0, snowAlphaL1, int(snowFrames) + snowDelayL1),
         255, 255, 255
     );
 
-    snowColourL2 = makeARGB(
+    int snowColourL2 = makeARGB(
         clamp(0, snowAlphaL2, int(snowFrames) + snowDelayL2),
         255, 255, 255
     );
 
-    snowColourL3 = makeARGB(
+    int snowColourL3 = makeARGB(
         clamp(0, snowAlphaL3, int(snowFrames) + snowDelayL3),
         255, 255, 255
     );
@@ -381,13 +378,6 @@ void drawBaubles(int cx, int y)
 
 //==== Star ====================================================================
 
-// Star Colour & glow Variables
-int starColour;             // colour of the star
-int illumColour;            // colour of tree illuminated by the star
-int glowColour1;            // primary glow colour
-int glowColour2;            // secondaty glow colour
-int glowValue;              // source of glow pulse
-
 // Star Colour & glow Constants
 const int glowPeriod = 12;  // period of glow pulse (x 256 ms)
 
@@ -395,25 +385,25 @@ void drawStar(int cx, int y)
 {
     // Glow pulse rate
     // Triangle wave with values in [0 - 128]
-    glowValue = abs((getMillisecondCounter() / glowPeriod) % 257 - 128);
+    int glowValue = abs((getMillisecondCounter() / glowPeriod) % 257 - 128);
 
-    // Centre
+    // Draw centre of the Star
     blendPixel(0xFFFFFFFF, cx,     y - 1);
 
-    // Star
-    starColour = makeARGB(200 + glowValue * 55 / 128, 255, 220, 0);
+    // Draw the Star
+    int starColour = makeARGB(200 + glowValue * 55 / 128, 255, 220, 0);
 
     blendPixel(starColour, cx,     y - 2);
     blendPixel(starColour, cx - 1, y - 1);
     blendPixel(starColour, cx + 1, y - 1);
 
-    // Tree illumination
-    illumColour = makeARGB(60 + glowValue * 32 / 128, 255, 255, 0);
+    // Draw tree illumination
+    int illumColour = makeARGB(60 + glowValue * 32 / 128, 255, 255, 0);
 
     blendPixel(illumColour, cx,     y);
 
-    // Primary Glow
-    glowColour1 = makeARGB(8 + glowValue * 24 / 128, 255, 255, 0);
+    // Draw primary Glow
+    int glowColour1 = makeARGB(8 + glowValue * 24 / 128, 255, 255, 0);
 
     blendPixel(glowColour1, cx - 1, y - 2);
     blendPixel(glowColour1, cx + 1, y - 2);
@@ -424,8 +414,8 @@ void drawStar(int cx, int y)
     blendPixel(glowColour1, cx - 2, y - 1);
     blendPixel(glowColour1, cx + 2, y - 1);
 
-    // Secondary Glow
-    glowColour2 = makeARGB(glowValue * 6 / 128, 255, 200, 0 );
+    // Draw secondary Glow
+    int glowColour2 = makeARGB(glowValue * 6 / 128, 255, 200, 0 );
 
     blendPixel(glowColour2, cx - 2, y - 2);
     blendPixel(glowColour2, cx + 2, y - 2);
@@ -498,7 +488,7 @@ const int ringColour = 0xA0FFFF00;
 const float maxRingRadius = 15.0;       // reset animation after reaching this
 const float ringRate = 0.7;             // rate of ring animation
 
-// Magic Ring Variables
+// Magic Ring Global Variable
 float ringRadius;
 
 // Star location constraints
