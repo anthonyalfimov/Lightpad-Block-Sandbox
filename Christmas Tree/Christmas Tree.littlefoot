@@ -524,9 +524,9 @@ const float ringRate = 0.7;             // rate of ring animation
 float ringRadius;
 
 // Star location constraints
-const float maxY = 1.9 * 3  / 14;
-const float minX = 1.9 * 6  / 14;
-const float maxX = 1.9 * 10 / 14;
+const float maxY = 1.9 * (treeTopY + 1)  / 14;
+const float minX = 1.9 * (treeTopX - 2)  / 14;
+const float maxX = 1.9 * (treeTopX + 2) / 14;
 
 // Initialiser
 void initMagicRing()
