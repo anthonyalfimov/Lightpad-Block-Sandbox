@@ -589,6 +589,12 @@ void sendPressure(int channel, int pressure)
     sendMIDI (0xd0 | channel, pressure);
 }
 
+// Oversimplified implementation
+int getPitchBend(float x)
+{
+    return clamp(0, 16383, int(map(x, 0.07, 1.93, 0.0, 16383.0)));
+}
+
 /*
     TODO:
         - Pitch bend
@@ -675,6 +681,11 @@ void touchStart (int index, float x, float y, float z, float vz)
             sendPressure((channelStar - 1), pressure);
         }
 
+        if (shouldSendPitchBend)
+        {
+            sendPitchBend((channelStar - 1), getPitchBend(x));
+        }
+
         // Start animation
         isMagic = true;
         ringRadius = 0;     // reset the ring on consequent touches
@@ -737,6 +748,10 @@ void touchMove (int index, float x, float y, float z, float vz)
         }
 
         // Send Pitch Bend
+        if (shouldSendPitchBend)
+        {
+            sendPitchBend((channelStar - 1), getPitchBend(x));
+        }
     }
 }
 
