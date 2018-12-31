@@ -668,8 +668,8 @@ void touchStart (int index, float x, float y, float z, float vz)
     int intX = int(x * 0.5 * 15.0);
     int intY = int(y * 0.5 * 15.0);
 
-    if (intX >= (starX - 1) && intX <= (starX + 1) &&
-        intY >= (starY - 1) && intY <= (starY + 1))
+    if (intX >= (starX - 2) && intX <= (starX + 2) &&
+        intY >= (starY - 1) && intY <= (starY + 2))
     {
         // Send MIDI note & control messages
         int velocity = clamp(1, 127, int(vz * 127.0));
