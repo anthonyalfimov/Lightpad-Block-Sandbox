@@ -77,10 +77,15 @@ bool isMagic;           // starshine animation playing / not playing
 bool isSnowing;         // snowing / not snowing
 
 //==============================================================================
-//  Global Constants
+//  Global Position Constants
 //==============================================================================
+// Tree
 const int treeTopX = 7; // x-coordinate of the treetop
 const int treeTopY = 2; // y-coordinate of the treetop
+
+// Star
+const int starX = treeTopX;
+const int starY = treeTopY - 1;
 
 //==============================================================================
 //  Drawing Functions
@@ -523,11 +528,6 @@ const float ringRate = 0.7;             // rate of ring animation
 // Magic Ring Global Variable
 float ringRadius;
 
-// Star location constraints
-const float maxY = 1.9 * (treeTopY + 1)  / 14;
-const float minX = 1.9 * (treeTopX - 2)  / 14;
-const float maxX = 1.9 * (treeTopX + 2) / 14;
-
 // Initialiser
 void initMagicRing()
 {
@@ -632,13 +632,18 @@ void handleButtonDown (int index)
 void touchStart (int index, float x, float y, float z, float vz)
 {
     // If the Star is touched, send MIDI note and play Magic Ring animation
-    if ( y < maxY && x > minX && x < maxX )
+    int intX = int(x * 0.5 * 15.0);
+    int intY = int(y * 0.5 * 15.0);
+
+    if (intX > (starX - 2) && intX < (starX + 2) &&
+        intY > (starY - 2) && intY < (starY + 2))
     {
         // Send MIDI note & control messages
         starIndex = index;  // Save touch index
 
         int velocity = clamp(1, 127, int(vz * 127.0));
         sendNoteOn((channelStar - 1), noteStar, velocity);
+
 
         if (shouldSendPressure)
         {
