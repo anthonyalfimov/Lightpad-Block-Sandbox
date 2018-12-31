@@ -679,8 +679,6 @@ void touchStart (int index, float x, float y, float z, float vz)
         isMagic = true;
         ringRadius = 0;     // reset the ring on consequent touches
 
-        log(index);
-
         // Assign touch to the control - Star
         setControl(index, ctrlStar);
     }
@@ -765,6 +763,7 @@ void touchEnd (int index, float x, float y, float z, float vz)
 
     setControl(index, 0xff);    // reset control index associated with touch
 }
+
 
 /*
 <display backgroundColour="0xFF202040" textColour ="0xFFFFC800">
