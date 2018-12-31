@@ -21,7 +21,7 @@
                   type="bool" value="true" />
         <variable name="shouldSendPressure" displayName="Send Channel Pressure"
                   group="star"
-                  type="bool" value="true" />
+                  type="bool" value="false" />
 
         <variable name="channelSnow" displayName="MIDI Channel" group="snow"
                   type="int" min="1" max="16" value="1" displayMode="stepper"
@@ -75,8 +75,9 @@
 /*
    Heap layout:
 
-  === 24 x Touch ===
-   0     1 byte x 24   corresponding control index (0xff if none)
+  === 16 x Touch ===
+   0     1 byte x 16   corresponding control index (0xff if none)
+   16    4 byte x 16   initial touch X coordinate
 */
 //==============================================================================
 
@@ -589,15 +590,24 @@ void sendPressure(int channel, int pressure)
     sendMIDI (0xd0 | channel, pressure);
 }
 
-// Oversimplified implementation
-int getPitchBend(float x)
+void setInitialX (int touchIndex, float initialX)
 {
-    return clamp(0, 16383, int(map(x, 0.07, 1.93, 0.0, 16383.0)));
+	setHeapInt ((touchIndex * 4) + 16, int (initialX * 1e6));
+}
+
+float getInitialX (int touchIndex)
+{
+    return float (getHeapInt ((touchIndex * 4) + 16)) / 1e6;
+}
+
+int getPitchBend(int touchIndex, float x)
+{
+    float initialX = getInitialX(touchIndex);
+    return clamp(0, 16383, int(map(x - initialX, -0.93, 0.93, 0.0, 16383.0)));
 }
 
 /*
     TODO:
-        - Pitch bend
         - Ring
 */
 
@@ -683,7 +693,8 @@ void touchStart (int index, float x, float y, float z, float vz)
 
         if (shouldSendPitchBend)
         {
-            sendPitchBend((channelStar - 1), getPitchBend(x));
+            setInitialX(index, x);
+            sendPitchBend((channelStar - 1), 8192);
         }
 
         // Start animation
@@ -750,7 +761,8 @@ void touchMove (int index, float x, float y, float z, float vz)
         // Send Pitch Bend
         if (shouldSendPitchBend)
         {
-            sendPitchBend((channelStar - 1), getPitchBend(x));
+            int bendAmount = getPitchBend(index, x);
+            sendPitchBend((channelStar - 1), bendAmount);
         }
     }
 }
