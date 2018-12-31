@@ -644,7 +644,6 @@ void touchStart (int index, float x, float y, float z, float vz)
         int velocity = clamp(1, 127, int(vz * 127.0));
         sendNoteOn((channelStar - 1), noteStar, velocity);
 
-
         if (shouldSendPressure)
         {
             int pressure = clamp(0, 127, int(z * 127.0));
