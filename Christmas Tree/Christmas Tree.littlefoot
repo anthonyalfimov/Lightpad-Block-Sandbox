@@ -69,6 +69,17 @@
 </metadata>
 */
 
+#heapsize: 32
+
+//==============================================================================
+/*
+   Heap layout:
+
+  === 24 x Touch ===
+   0     1 byte x 24   corresponding control index (0xff if none)
+*/
+//==============================================================================
+
 //==============================================================================
 //  Global State Variables
 //==============================================================================
@@ -550,8 +561,9 @@ void drawMagic(int cx, int y)
 //  MIDI
 //==============================================================================
 
-// Touch index associated with the Star
-int starIndex;      // 0 if no touch is associated with the Star
+// Control indices (1 byte)
+const int ctrlStar = 0x01;
+const int ctrlSnow = 0x02;
 
 void initNotes()
 {
@@ -562,10 +574,24 @@ void initNotes()
     }
 }
 
+void setControl(int touchIndex, int ctrlIndex)
+{
+    setHeapByte(touchIndex, ctrlIndex);
+}
+
+int getControl(int touchIndex)
+{
+    return getHeapByte (touchIndex);
+}
+
+void sendPressure(int channel, int pressure)
+{
+    sendMIDI (0xd0 | channel, pressure);
+}
+
 /*
     TODO:
         - Pitch bend
-        - Pressure
         - Ring
 */
 
@@ -629,30 +655,34 @@ void handleButtonDown (int index)
 
 //==== Touch ===================================================================
 
+
 void touchStart (int index, float x, float y, float z, float vz)
 {
     // If the Star is touched, send MIDI note and play Magic Ring animation
     int intX = int(x * 0.5 * 15.0);
     int intY = int(y * 0.5 * 15.0);
 
-    if (intX > (starX - 2) && intX < (starX + 2) &&
-        intY > (starY - 2) && intY < (starY + 2))
+    if (intX >= (starX - 1) && intX <= (starX + 1) &&
+        intY >= (starY - 1) && intY <= (starY + 1))
     {
         // Send MIDI note & control messages
-        starIndex = index;  // Save touch index
-
         int velocity = clamp(1, 127, int(vz * 127.0));
         sendNoteOn((channelStar - 1), noteStar, velocity);
 
         if (shouldSendPressure)
         {
             int pressure = clamp(0, 127, int(z * 127.0));
-            sendChannelPressure((channelStar - 1), pressure);
+            sendPressure((channelStar - 1), pressure);
         }
 
         // Start animation
         isMagic = true;
         ringRadius = 0;     // reset the ring on consequent touches
+
+        log(index);
+
+        // Assign touch to the control - Star
+        setControl(index, ctrlStar);
     }
     else if (isSnowing)
     {
@@ -666,6 +696,9 @@ void touchStart (int index, float x, float y, float z, float vz)
         // NOTE: Pressure blobs look better centered on the finger location
         // if the coordinates here are multiplied by 0.93. How bizarre
         addPressurePoint(0x60FF8040, x * 0.93, y * 0.93, 5.0);
+
+        // Assign touch to the control - Snow
+        setControl(index, ctrlSnow);
     }
     else
     {
@@ -681,18 +714,28 @@ void touchStart (int index, float x, float y, float z, float vz)
         // NOTE: Pressure blobs look better centered on the finger location
         // if the coordinates here are multiplied by 0.93. How bizarre
         addPressurePoint(0x608080FF, x * 0.93, y * 0.93, 5.0);
+
+        // Assign touch to the control - Snow
+        setControl(index, ctrlSnow);
     }
 }
 
 void touchMove (int index, float x, float y, float z, float vz)
 {
-    if (index == starIndex)
+    int ctrlIndex = getControl(index);
+
+    if (ctrlIndex == 0xff)
+    {
+        return;  // touch was not started or tracked
+    }
+
+    if (ctrlIndex == ctrlStar)
     {
         // Send Channel Pressure
         if (shouldSendPressure)
         {
             int pressure = clamp(0, 127, int(z * 127.0));
-            sendChannelPressure((channelStar - 1), pressure);
+            sendPressure((channelStar - 1), pressure);
         }
 
         // Send Pitch Bend
@@ -701,7 +744,14 @@ void touchMove (int index, float x, float y, float z, float vz)
 
 void touchEnd (int index, float x, float y, float z, float vz)
 {
-    if (index == starIndex)
+    int ctrlIndex = getControl(index);
+
+    if (ctrlIndex == 0xff)
+    {
+        return;  // touch was not started or tracked
+    }
+
+    if (ctrlIndex == ctrlStar)
     {
         int velocity = clamp(0, 127, int(vz * 127.0));
         sendNoteOff((channelStar - 1), noteStar, velocity);
@@ -709,11 +759,11 @@ void touchEnd (int index, float x, float y, float z, float vz)
         if (shouldSendPressure)
         {
             int pressure = clamp(0, 127, int(z * 127.0));
-            sendChannelPressure((channelStar - 1), pressure);
+            sendPressure((channelStar - 1), pressure);
         }
-
-        starIndex = 0;      // reset the touch index associated with the Star
     }
+
+    setControl(index, 0xff);    // reset control index associated with touch
 }
 
 /*
