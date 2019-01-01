@@ -24,9 +24,10 @@ Experiments with Littlefoot scripts for ROLI Lightpad Block.
 
 Festive Christmas Tree for your Lightpad Block.
 
-Tap the block anywhere except for the Star to make it snow! Tap again to melt
-the snow away. Tap the Star to see it shine!
-The Mode button controls blinking of the lights.
+Tap the Star to make it shine and play the specified note (with velocity, pitch bend and channel pressure).
+Tap the block anywhere else to make it snow (and toggle the specified MIDI CC to ON).
+Tap again to melt the snow away (and toggle MIDI CC to OFF).
+The Mode button controls the blinking of the lights.
 
 ---
 
