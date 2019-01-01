@@ -69,10 +69,19 @@
 </metadata>
 */
 
-#heapsize: 24
+#heapsize: 80
 
 //==============================================================================
 /*
+    NOTE: it seems that touch indices begin from 1, but all Factory scripts
+          allow for index-0 touch, so just in case we'll do it too.
+          (Possibly as padding?)
+
+          Currently we do not actively limit the number of allowed touches,
+          assuming (hoping) nobody will manage to creat more than 15
+          simultaneous touches on one Block (16 if index-0 touch can
+          actually happen)
+
    Heap layout:
 
   === 16 x Touch ===
