@@ -594,11 +594,6 @@ int getControl(int touchIndex)
     return getHeapByte (touchIndex);
 }
 
-void sendPressure(int channel, int pressure)
-{
-    sendMIDI (0xd0 | channel, pressure);
-}
-
 void setInitialX (int touchIndex, float initialX)
 {
 	setHeapInt ((touchIndex * 4) + 16, int (initialX * 1e6));
@@ -697,7 +692,7 @@ void touchStart (int index, float x, float y, float z, float vz)
         if (shouldSendPressure)
         {
             int pressure = clamp(0, 127, int(z * 127.0));
-            sendPressure((channelStar - 1), pressure);
+            sendChannelPressure((channelStar - 1), pressure);
         }
 
         if (shouldSendPitchBend)
@@ -764,7 +759,7 @@ void touchMove (int index, float x, float y, float z, float vz)
         if (shouldSendPressure)
         {
             int pressure = clamp(0, 127, int(z * 127.0));
-            sendPressure((channelStar - 1), pressure);
+            sendChannelPressure((channelStar - 1), pressure);
         }
 
         // Send Pitch Bend
@@ -793,7 +788,7 @@ void touchEnd (int index, float x, float y, float z, float vz)
         if (shouldSendPressure)
         {
             int pressure = clamp(0, 127, int(z * 127.0));
-            sendPressure((channelStar - 1), pressure);
+            sendChannelPressure((channelStar - 1), pressure);
         }
     }
 
