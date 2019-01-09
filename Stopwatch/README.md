@@ -10,6 +10,6 @@ Tap to start or pause the stopwatch, press the Mode (side) button to reset.
 
 1. Clone or download (Clone or download -> Download ZIP) the whole repository to your computer.
 
-2. Copy the script into `Documents/ROLI/LittleFoot/` (both Win and MacOS; you might have to create the folder if it doesn't exist).
+2. Copy the script into `Documents/ROLI/LittleFoot/` (both Win and MacOS; you may have to create the folders if they don't exist).
 
 3. Launch ROLI Dashboard and select the app to load it into your Lightpad Block.
