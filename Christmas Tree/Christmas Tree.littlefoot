@@ -235,7 +235,7 @@ void drawSnowFall(int argb, int start, int end)
 
         // Update snowflake position
         snowY += snowRate;
-        if (snowY > 15.06)
+        if (snowY > 15.0)
             setSnowY(i, 0.0);
         else
             setSnowY(i, snowY);
