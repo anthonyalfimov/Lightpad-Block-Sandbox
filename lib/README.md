@@ -13,13 +13,13 @@ int makeARGBfromAHSV(int alpha, int hue, int sat, int val)
 
 Combines a set of 8-bit AHSV values into a 32-bit colour and returns the result.
 
-| Returns | 
+| Returns |
 |-|
 | A 32-bit colour |
 
 |     Parameters    | Description |
 |-|-|
-| alpha   | The alpha in range 0 - 255 inclusive |
-| hue     | The hue in range 0 - 255 inclusive   |
-| sat     | The saturation in range 0 - 255 inclusive |
-| val     | The value (brightness) in range 0 - 255 inclusive |
+| `alpha`   | The alpha in range 0 - 255 inclusive |
+| `hue`     | The hue in range 0 - 255 inclusive   |
+| `sat`     | The saturation in range 0 - 255 inclusive |
+| `val`     | The value (brightness) in range 0 - 255 inclusive |
