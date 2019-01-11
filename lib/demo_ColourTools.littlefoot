@@ -1,0 +1,66 @@
+/*
+<metadata description="Basic colourmap script demonstrating the use of lib_ColourTools">
+
+</metadata>
+*/
+
+#include "lib_ColourTools.littlefoot"           // Include the Colour Tools lib
+
+int activeTouches;                              // holds bit flags for active touches
+int colourMapAlpha;                             // alpha value to dim the colourmap
+
+// Sets and unsets bit flags for touches 
+void setTouch(int touchIndex, bool shouldBeActive)
+{
+    activeTouches = shouldBeActive ? (activeTouches | (1 << touchIndex))
+                                   : (activeTouches & ~(1 << touchIndex));
+}
+
+// Simple colour map function
+void fillColourMap()
+{
+    for (int x = 0; x < 15; x++)
+        for (int y = 0; y < 15; y++)
+            blendPixel(makeARGBfromAHSV(colourMapAlpha, 17 * x, 255, 255 - 17 * y), x, y);
+}
+
+void initialise()
+{
+    activeTouches = 0;
+}
+
+void repaint()
+{
+    // If any touch is active, dim the colourmap
+    colourMapAlpha = activeTouches ? 100 : 255;
+    
+    clearDisplay();
+    fillColourMap();
+    
+    // Overlay heatmap
+    drawPressureMap();
+    fadePressureMap();
+    //log(getTimeInCurrentFunctionCall());
+}
+
+// For the sake of example we don't bother to be very precise with 
+//     calculating colour from touch location to exactly match
+//     the colour of the colourmap underneath
+
+void touchStart (int index, float x, float y, float z, float vz)
+{
+    int colour = makeARGBfromAHSV(255, int(255.0 * x / 2.0), 255, 255);
+    addPressurePoint (colour, x * 0.93, y * 0.93, z * 100.0);
+    setTouch(index, true);
+}
+
+void touchMove (int index, float x, float y, float z, float vz)
+{
+    int colour = makeARGBfromAHSV(255, int(255.0 * x / 2.0), 255, 255);
+    addPressurePoint (colour, x * 0.93, y * 0.93, z * 40.0);
+}
+
+void touchEnd (int index, float x, float y, float z, float vz)
+{
+    setTouch(index, false);
+}
