@@ -1,11 +1,18 @@
-// Stopwatch 0.2
+// Stopwatch 0.3
 
 /*
 <metadata description="Stopwatch for your Lightpad Block"
           details="Tap to start or pause the stopwatch, press the side button to reset"
           target="Lightpad">
+    <variables>
+        <variable name="saveToFlash" displayName="Save time to flash on Pause"
+                  type="bool" value="true"
+                  tooltip="Every time the stopwatch is paused, save the accumulated time to flash to preserve it on power-off" />
+    </variables>
 </metadata>
 */
+
+//==============================================================================
 
 //==============================================================================
 //  Global State Variables
@@ -26,6 +33,20 @@ int savedTime;              // time accumulated up until the latest pause (ms)
 const int MAX_TIME = 5999000;   // == 99m : 59s max allowed time (ms)
 
 //==============================================================================
+//  Save Time to flash on Pause
+//==============================================================================
+
+void setSavedTime(int t)
+{
+    setLocalConfig(64, t);
+}
+
+int getSavedTime()
+{
+    return getLocalConfig(64);
+}
+
+//==============================================================================
 //  Stopwatch control functions
 //==============================================================================
 
@@ -42,6 +63,9 @@ void pause()
 {
     isRunning = false;                      // stop stopwatch
     savedTime = time;                       // save accumulated time
+
+    if (saveToFlash)
+        setSavedTime(savedTime);            // write accumulated time to flash
 }
 
 void reset()
@@ -49,6 +73,9 @@ void reset()
     isRunning = false;                      // stop stopwatch
     savedTime = 0;                          // reset accumulated time
     time = 0;                               // reset time
+
+    if (saveToFlash)
+        setSavedTime(0);                     // clear accumulated time in flash
 
     if (isOverflown)
         clearOverflow();
@@ -69,6 +96,9 @@ void clearOverflow()
     savedTime = 0;
     time = 0;
     isOverflown = false;
+
+    if (saveToFlash)
+        setSavedTime(0);                     // clear accumulated time in flash
 }
 
 //==============================================================================
@@ -112,8 +142,15 @@ void drawTime()
 
 void initialise()
 {
+//  Set up Local Config to store Time on pressing Pause
+    setLocalConfigActiveState(64, false, true); // don't show on dashboard, save to flash
+    if (!saveToFlash)
+        setSavedTime(0);
+
 //  Initialize global variables
-    savedTime = 0;          // TODO: save to and load from permanent memory
+    savedTime = saveToFlash ? getSavedTime() : 0;
+    time = savedTime;
+
     isRunning = false;
     isOverflown = false;
 }
