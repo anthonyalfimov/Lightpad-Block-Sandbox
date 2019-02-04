@@ -1,4 +1,4 @@
-// Stopwatch 0.1 - Minimal Implementation
+// Stopwatch 0.2
 
 /*
 <metadata description="Stopwatch for your Lightpad Block"
@@ -7,36 +7,33 @@
 </metadata>
 */
 
-// Global variables
+//==============================================================================
+//  Global State Variables
+//==============================================================================
+bool isRunning;             // is stopwatch running
+bool isOverflown;           // has max allowed time passed
 
+//==============================================================================
+//  Global Time Variables
+//==============================================================================
 int time;                   // stopwatch time (ms)
 int startTime;              // stopwatch start time (ms)
 int savedTime;              // time accumulated up until the latest pause (ms)
 
-// State variables
-bool isRunning;             // is stopwatch running
-bool isOverflown;           // has max allowed time passed
-
-// Constants
+//==============================================================================
+//  Global Constants
+//==============================================================================
 const int MAX_TIME = 5999000;   // == 99m : 59s max allowed time (ms)
 
-
-
-void initialise()
-{
-//  Initialize global variables    
-    savedTime = 0;          // TODO: save to and load from permanent memory
-    isRunning = false;
-    isOverflown = false;
-}
-
-// Stopwatch control functions
+//==============================================================================
+//  Stopwatch control functions
+//==============================================================================
 
 void start()
 {
     startTime = getMillisecondCounter();    // record start time
     isRunning = true;                       // start stopwatch
-    
+
     if (isOverflown)
         clearOverflow();
 }
@@ -52,7 +49,7 @@ void reset()
     isRunning = false;                      // stop stopwatch
     savedTime = 0;                          // reset accumulated time
     time = 0;                               // reset time
-    
+
     if (isOverflown)
         clearOverflow();
 }
@@ -74,35 +71,33 @@ void clearOverflow()
     isOverflown = false;
 }
 
-// Time display function
-
-// Use global variables to avoid allocating each call
-int minutes;    
-int seconds;
+//==============================================================================
+//  Display functions
+//==============================================================================
 
 void drawTime()
 {
-    minutes = time / 1000 / 60;
-    seconds = time / 1000 % 60;
-    
+    int minutes = time / 1000 / 60;
+    int seconds = time / 1000 % 60;
+
     // Draw minutes (align right):
     if (minutes < 10)
     {
         //drawNumber(0,       0xFFFFFFFF, 2, 2);
-        drawNumber(minutes, 0xFFFFFFFF, 7, 2);  
+        drawNumber(minutes, 0xFFFFFFFF, 7, 2);
     }
     else
         drawNumber(minutes, 0xFFFFFFFF, 2, 2);
-        
+
     // Draw seconds (always show two deigits):
     if (seconds < 10)
     {
         drawNumber(0,       0xFFFFFFFF, 2, 8);
-        drawNumber(seconds, 0xFFFFFFFF, 7, 8);  
+        drawNumber(seconds, 0xFFFFFFFF, 7, 8);
     }
     else
         drawNumber(seconds, 0xFFFFFFFF, 2, 8);
-        
+
     // Draw separator (blink every second, keep on when not running):
     if (!isRunning || (time / 500 % 2 == 0))
     {
@@ -111,36 +106,55 @@ void drawTime()
     }
 }
 
-// Repaint
+//==============================================================================
+//  Initialization
+//==============================================================================
 
+void initialise()
+{
+//  Initialize global variables
+    savedTime = 0;          // TODO: save to and load from permanent memory
+    isRunning = false;
+    isOverflown = false;
+}
+
+//==============================================================================
+//  Repaint
+//==============================================================================
 
 void repaint()
 {
     clearDisplay();
-    
+
     // Update time
     if (isRunning)
     {
         time = savedTime + getMillisecondCounter() - startTime;
         checkOveflow();
     }
-    
+
     // Temporary minimal design
     fillRect(0x050510, 0, 2, 15, 5);
     fillRect(0x050510, 0, 8, 15, 5);
-    
+
     // Temporary overflow indication
-    //{
     if (isOverflown)
         fillRect(0x220000, 0, 0, 15, 15);
-    //} 
-        
+
     drawTime();
 }
 
-// Event handlers
+//==============================================================================
+//  Event Handlers
+//==============================================================================
 
+//==== Button ==================================================================
+void handleButtonDown (int index)
+{
+    reset();
+}
 
+//==== Touch ===================================================================
 void touchStart (int index, float x, float y, float z, float vz)
 {
     if (isRunning)
@@ -148,13 +162,6 @@ void touchStart (int index, float x, float y, float z, float vz)
     else
         start();
 }
-
-
-void handleButtonDown (int index)
-{
-    reset();
-}
-
 
 
 /*
