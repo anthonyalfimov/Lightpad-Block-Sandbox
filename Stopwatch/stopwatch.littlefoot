@@ -1,4 +1,4 @@
-// Stopwatch 0.3
+// Stopwatch 0.4
 
 /*
 <metadata description="Stopwatch for your Lightpad Block"
@@ -6,7 +6,7 @@
           target="Lightpad">
     <variables>
         <variable name="saveToFlash" displayName="Save time to flash on Pause"
-                  type="bool" value="true"
+                  type="bool" value="false"
                   tooltip="Every time the stopwatch is paused, save the accumulated time to flash to preserve it on power-off" />
     </variables>
 </metadata>
@@ -26,9 +26,27 @@ int startTime;              // stopwatch start time (ms)
 int savedTime;              // time accumulated up until the latest pause (ms)
 
 //==============================================================================
+//  Global Splash Animation Variables
+//==============================================================================
+int frames;                 // frame countdown for splash animation
+
+// == Enum-like construct for splash type ==
+int splashType;
+const int PLAY  = 0;
+const int PAUSE = 1;
+const int RESET = 2;
+// =========================================
+
+// Use time in ms for delay and fade, convert to frames by dividing by 40:
+const int framesDelay = 200 / 40;       // frame count for delay before fade
+const int framesFade  = 840 / 40;       // frame count for fade
+const int framesMax   = framesDelay + framesFade;
+                                        // frame count at beginning of animation
+
+//==============================================================================
 //  Global Constants
 //==============================================================================
-const int MAX_TIME = 5999000;   // == 99m : 59s max allowed time (ms)
+const int maxTime = 5999000;            // == 99m : 59s max allowed time (ms)
 
 //==============================================================================
 //  Save time to flash
@@ -48,26 +66,37 @@ int getFlashTime()
 //  Stopwatch control functions
 //==============================================================================
 
-void start()
+void doStart()
 {
+//  Handle time count
     startTime = getMillisecondCounter();    // record start time
     isRunning = true;                       // start stopwatch
 
     if (isOverflown)
         clearOverflow();
+
+//  Handle splash animation
+    splashType = PLAY;
+    frames = framesMax;
 }
 
-void pause()
+void doPause()
 {
+//  Handle time count
     isRunning = false;                      // stop stopwatch
 
     savedTime = time;                       // save accumulated time
     if (saveToFlash)
         setFlashTime(savedTime);            // write accumulated time to flash
+
+//  Handle splash animation
+    splashType = PAUSE;
+    frames = framesMax;
 }
 
-void reset()
+void doReset()
 {
+//  Handle time count
     isRunning = false;                      // stop stopwatch
     time = 0;                               // reset time
 
@@ -77,13 +106,17 @@ void reset()
 
     if (isOverflown)
         clearOverflow();
+
+//  Handle splash animation
+    splashType = RESET;
+    frames = framesMax;
 }
 
 void checkOveflow()
 {
-    if (time >= MAX_TIME)
+    if (time >= maxTime)
     {
-        time = MAX_TIME;
+        time = maxTime;
         isOverflown = true;
         isRunning = false;
     }
@@ -103,6 +136,46 @@ void clearOverflow()
 //==============================================================================
 //  Display functions
 //==============================================================================
+
+void blendPause(int alpha)
+{
+    blendRect(makeARGB(alpha / 2, 0, 0, 0), 0, 0, 15, 15);  // dim the screen
+    int colour = makeARGB(alpha, 0xFF, 0xFF, 0);
+
+    // Drawing icon
+    blendRect(colour, 5, 5, 2, 5);
+    blendRect(colour, 8, 5, 2, 5);
+}
+
+void blendPlay(int alpha)
+{
+    blendRect(makeARGB(alpha / 2, 0, 0, 0), 0, 0, 15, 15);  // dim the screen
+    int colour = makeARGB(alpha, 0, 0xFF, 0);
+
+    // Drawing icon
+    blendRect(colour, 6, 5, 1, 5);
+    blendRect(colour, 7, 6, 1, 3);
+    blendPixel(colour, 8, 7);
+}
+
+void blendReset(int alpha)
+{
+    blendRect(makeARGB(alpha / 2, 0, 0, 0), 0, 0, 15, 15);  // dim the screen
+    int colour = makeARGB(alpha, 0xFF, 0, 0);
+
+    // Drawing icon
+    blendRect(colour, 5, 5, 5, 5);
+}
+
+void drawSplash()
+{
+    if (splashType == PLAY)
+        blendPlay(frames * 255 / framesFade);
+    else if (splashType == PAUSE)
+        blendPause(frames * 255 / framesFade);
+    else if (splashType == RESET)
+        blendReset(frames * 255 / framesFade);
+}
 
 void drawTime()
 {
@@ -153,6 +226,10 @@ void initialise()
 //  Initialise global state variables
     isRunning = false;
     isOverflown = false;
+
+//  Initialise splash animation
+    frames = 0;
+    splashType = PLAY;
 }
 
 //==============================================================================
@@ -181,6 +258,12 @@ void repaint()
 //==============================================
 
     drawTime();
+
+    if (frames > 0)
+    {
+        drawSplash();
+        frames--;
+    }
 }
 
 //==============================================================================
@@ -190,16 +273,16 @@ void repaint()
 //==== Button ==================================================================
 void handleButtonDown (int index)
 {
-    reset();
+    doReset();
 }
 
 //==== Touch ===================================================================
 void touchStart (int index, float x, float y, float z, float vz)
 {
     if (isRunning)
-        pause();
+        doPause();
     else
-        start();
+        doStart();
 }
 
 
