@@ -143,7 +143,7 @@ void initialise()
 {
 //  Set up a Local Config for storing accumulated time in flash
     setLocalConfigActiveState(64, false, true); // don't show on dashboard, save to flash
-    if (!saveToFlash)
+    if (!saveToFlash)                           // clear previously saved time
         setFlashTime(0);
 
 //  Initialise global variables
@@ -170,6 +170,7 @@ void repaint()
         checkOveflow();
     }
 
+//==============================================
     // Temporary minimal design
     fillRect(0x050510, 0, 2, 15, 5);
     fillRect(0x050510, 0, 8, 15, 5);
@@ -177,6 +178,7 @@ void repaint()
     // Temporary overflow indication
     if (isOverflown)
         fillRect(0x220000, 0, 0, 15, 15);
+//==============================================
 
     drawTime();
 }
