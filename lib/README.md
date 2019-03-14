@@ -2,7 +2,7 @@
 
 A collection of reusable Littlefoot functions.
 
-> NOTE: files prefixed with `lib` contain only function definitions and are designed to be used with `#include` directive to make these functions available for your scripts.
+*NOTE*: files prefixed with `lib` contain only function definitions and are designed to be used with `#include` directive to make these functions available for your scripts.
 
 ## Colour Tools
 
