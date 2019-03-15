@@ -22,7 +22,7 @@ Experiments with Littlefoot scripts for ROLI Lightpad Block.
 
 ![Christmas Tree](Christmas%20Tree/screenshot01.png "Christmas Tree")
 
-Festive Christmas Tree for your Lightpad Block.
+Festive Christmas Tree for your Lightpad Block - [see it in action!](https://www.instagram.com/p/BsG6yCYB9jI/)
 
 Tap the Star to make it shine and play the specified note (with velocity, pitch bend and channel pressure).
 Tap the block anywhere else to make it snow (and toggle the specified MIDI CC to ON).
