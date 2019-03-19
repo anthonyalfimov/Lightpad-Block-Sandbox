@@ -1,4 +1,4 @@
-// Stopwatch 0.5
+// Stopwatch 0.6
 
 /*
 <metadata description="Stopwatch for your Lightpad Block"
@@ -310,7 +310,7 @@ void touchStart (int index, float x, float y, float z, float vz)
 }
 
 /*
-<display backgroundColour="0xFF83DD79" textColour ="0xFF000000">
+<display backgroundColour="0xFF3568A0" textColour ="0xFFFFFFFF">
     <pixels>
         <pixel index="15" colour="0xFF2222AA" />
         <pixel index="16" colour="0xFF2222AA" />
