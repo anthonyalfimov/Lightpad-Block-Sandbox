@@ -33,8 +33,10 @@ The Mode button controls the blinking of the lights.
 
 ---
 
-### Octopus (WIP)
-Octopus character.
+### Stopwatch
+Stopwatch for your Lightpad Block.
+
+Tap to start or pause the stopwatch, press the Mode (side) button to reset.
 
 ---
 
@@ -43,7 +45,5 @@ A particle randomly traversing the LED grid of your Lightpad Block.
 
 ---
 
-### Stopwatch (WIP)
-Stopwatch for your Lightpad Block.
-
-Tap to start or pause the stopwatch, press the Mode (side) button to reset.
+### Octopus (WIP)
+Octopus character.
