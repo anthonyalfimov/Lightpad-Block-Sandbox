@@ -1,5 +1,9 @@
 # Christmas Tree App
 
+Grab the latest Christmas Tree app release [here](https://github.com/anthonyalfimov/Lightpad-Block-Sandbox/releases/tag/Christmas-Tree-v1.0)!
+
+---
+
 ![Christmas Tree](screenshot01.png)
 
 Festive Christmas Tree for your Lightpad Block - [see it in action!](https://www.instagram.com/p/BsG6yCYB9jI/)
@@ -9,14 +13,5 @@ Tap the block anywhere else to make it snow (and toggle the specified MIDI CC to
 Tap again to melt the snow away (and toggle MIDI CC to OFF).
 The Mode button controls the blinking of the lights.
 
----
 
-## Installation
 
-1. Clone or download (*Clone or download -> Download ZIP*) the whole repository to your computer.
-
-2. Make sure you have [ROLI Dashboard](https://roli.com/products/software/blocks-dashboard) installed.
-
-3. Copy the Littlefoot script `Christmas Tree/Christmas Tree.littlefoot`  into `Documents/ROLI/LittleFoot/` (both Win and MacOS; you may have to create the folders if they don't exist).
-
-4. Launch ROLI Dashboard and select the Christmas Tree app to load it into your Lightpad Block and tweak its parameters ("Edit" button).
