@@ -4,6 +4,7 @@
         <variable name="hue" displayName="Hue" type="float" min="0" max="255" value="128" />
         <variable name="sat" displayName="Saturation" type="float" min="0" max="255" value="255" />
         <variable name="val" displayName="Brightness" type="float" min="0" max="255" value="255" />
+        <variable name="gamma" displayName="Gamma Correction" type="bool" value="false" />
     </variables>  
 </metadata>
 */
@@ -56,7 +57,7 @@ int makeARGBfromAHSV(int alpha, int h, int s, int v)
 
 void initialise()
 {   
-    setLocalConfigActiveState (33, true, false);        // enable gamma correction parameter
+    setLocalConfig (33, int(gamma));        // enable gamma correction parameter
 }
 
 void repaint()
