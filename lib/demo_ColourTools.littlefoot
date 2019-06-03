@@ -27,6 +27,8 @@ void fillColourMap()
 void initialise()
 {
     activeTouches = 0;
+    
+    setLocalConfigActiveState (33, true, false);        // enable gamma correction parameter
 }
 
 void repaint()
