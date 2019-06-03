@@ -20,6 +20,8 @@ Experiments with Littlefoot scripts for ROLI Lightpad Block.
 
 ### Christmas Tree
 
+Grab the latest Christmas Tree app release [here](https://github.com/anthonyalfimov/Lightpad-Block-Sandbox/releases/tag/Christmas-Tree-v1.0)!
+
 ![Christmas Tree](Christmas%20Tree/screenshot01.png "Christmas Tree")
 
 Festive Christmas Tree for your Lightpad Block - [see it in action!](https://www.instagram.com/p/BsG6yCYB9jI/)
@@ -31,8 +33,10 @@ The Mode button controls the blinking of the lights.
 
 ---
 
-### Octopus (WIP)
-Octopus character.
+### Stopwatch
+Stopwatch for your Lightpad Block.
+
+Tap to start or pause the stopwatch, press the Mode (side) button to reset.
 
 ---
 
@@ -41,7 +45,5 @@ A particle randomly traversing the LED grid of your Lightpad Block.
 
 ---
 
-### Stopwatch (WIP)
-Stopwatch for your Lightpad Block.
-
-Tap to start or pause the stopwatch, press the Mode (side) button to reset.
+### Octopus (WIP)
+Octopus character.
