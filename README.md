@@ -40,10 +40,10 @@ Tap to start or pause the stopwatch, press the Mode (side) button to reset.
 
 ---
 
-### Random Walk
-A particle randomly traversing the LED grid of your Lightpad Block.
+### Octopus
+Octopus character.
 
 ---
 
-### Octopus (WIP)
-Octopus character.
+### Random Walk
+A particle randomly traversing the LED grid of your Lightpad Block.
