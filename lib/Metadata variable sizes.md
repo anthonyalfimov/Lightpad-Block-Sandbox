@@ -2,7 +2,7 @@
 
 Setter and getter function sizes are given for when using variables inside metadata vectors.
 
-| Variable type | Size, bytes | Getter size, bytes | Setter size, bytes | Size with setter, bytes | Size with setter and getter, bytes |
+| Variable type | Size, bytes | Getter size, bytes | Setter size, bytes | Size with getter, bytes | Size with setter and getter, bytes |
 | ------------- | ----------- | ------------------ | ------------------ | ----------------------- | ---------------------------------- |
 | int           | 4           | 22                 | 17                 | 26                      | 42                                 |
 | float         | 4           | 22                 | 17                 | 26                      | 42                                 |
