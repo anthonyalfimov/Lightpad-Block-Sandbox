@@ -22,7 +22,7 @@ Experiments with Littlefoot scripts for ROLI Lightpad Block.
 
 Grab the latest Christmas Tree app release [here](https://github.com/anthonyalfimov/Lightpad-Block-Sandbox/releases/tag/Christmas-Tree-v1.0)!
 
-![Christmas Tree](Christmas%20Tree/LF04ScreenShot01.png "Christmas Tree")
+![Christmas Tree](LF04%20Christmas%20Tree/LF04ScreenShot01.png "Christmas Tree")
 
 Festive Christmas Tree for your Lightpad Block - [see it in action!](https://www.instagram.com/p/BsG6yCYB9jI/)
 
@@ -40,10 +40,10 @@ Tap to start or pause the stopwatch, press the Mode (side) button to reset.
 
 ---
 
-### Random Walk
-A particle randomly traversing the LED grid of your Lightpad Block.
+### Octopus
+Octopus character.
 
 ---
 
-### Octopus (WIP)
-Octopus character.
+### Random Walk
+A particle randomly traversing the LED grid of your Lightpad Block.
