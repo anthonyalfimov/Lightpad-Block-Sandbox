@@ -4,7 +4,7 @@ Grab the latest Christmas Tree app release [here](https://github.com/anthonyalfi
 
 ---
 
-![Christmas Tree](screenshot01.png)
+![Christmas Tree](LF04ScreenShot01.png)
 
 Festive Christmas Tree for your Lightpad Block - [see it in action!](https://www.instagram.com/p/BsG6yCYB9jI/)
 
