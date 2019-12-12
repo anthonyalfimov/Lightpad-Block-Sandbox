@@ -22,7 +22,7 @@ Experiments with Littlefoot scripts for ROLI Lightpad Block.
 
 ---
 
-### Download: [ [Christmas Tree 1.0](https://github.com/anthonyalfimov/Lightpad-Block-Sandbox/releases/tag/Christmas-Tree-v1.0) ]
+### Download: [ [Christmas Tree 1.1](https://github.com/anthonyalfimov/Lightpad-Block-Sandbox/releases/tag/Christmas-Tree-v1.1) ]
 
 ---
 
