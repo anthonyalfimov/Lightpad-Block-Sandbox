@@ -6,23 +6,25 @@ Experiments with Littlefoot scripts for ROLI Lightpad Block.
 
 ## Installation
 
-1. Clone or download (*Clone or download -> Download ZIP*) the repository to your computer.
+1. Make sure you have [ROLI Dashboard](https://roli.com/products/software/blocks-dashboard) installed.
 
-2. Make sure you have [ROLI Dashboard](https://roli.com/products/software/blocks-dashboard) installed.
+2. Clone or download (*Clone or download -> Download ZIP*) the repository to your computer and navigate to the folder with the app that you want to install.
 
-3. Copy the scripts you are interested in into `Documents/ROLI/LittleFoot/` (both Win and MacOS; you may have to create the folders if they don't exist).
+3. Run the installer script for your operating system (`install-MAC` or `install-WIN`). Alternatively, you can manually copy `.littlefoot` apps to `Documents/ROLI/LittleFoot/` (both on MAC and WIN).
 
 4. Launch ROLI Dashboard and select the app to load it into your Lightpad Block and tweak its parameters ("Edit" button).
 
 ---
 
-## Contents
-
-### Christmas Tree
-
-Grab the latest Christmas Tree app release [here](https://github.com/anthonyalfimov/Lightpad-Block-Sandbox/releases/tag/Christmas-Tree-v1.0)!
+## Christmas Tree
 
 ![Christmas Tree](LF04%20Christmas%20Tree/LF04ScreenShot01.png "Christmas Tree")
+
+---
+
+### Download: [ [Christmas Tree 1.0](https://github.com/anthonyalfimov/Lightpad-Block-Sandbox/releases/tag/Christmas-Tree-v1.0) ]
+
+---
 
 Festive Christmas Tree for your Lightpad Block - [see it in action!](https://www.instagram.com/p/BsG6yCYB9jI/)
 
@@ -33,17 +35,20 @@ The Mode button controls the blinking of the lights.
 
 ---
 
-### Stopwatch
+## Stopwatch
+
 Stopwatch for your Lightpad Block.
 
 Tap to start or pause the stopwatch, press the Mode (side) button to reset.
 
 ---
 
-### Octopus
-Octopus character.
+## Octopus
+
+Cartoonish octopus for your Lightpad Block.
 
 ---
 
-### Random Walk
+## Random Walk
+
 A particle randomly traversing the LED grid of your Lightpad Block.
