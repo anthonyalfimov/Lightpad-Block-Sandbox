@@ -10,6 +10,10 @@ Experiments with Littlefoot scripts for ROLI Lightpad Block.
 
 ---
 
+### Download Christmas Tree 1.2: [ [Mac](https://github.com/anthonyalfimov/Lightpad-Block-Sandbox/releases/download/Christmas-Tree-v1.2/ChristmasTree-Mac-1.2.pkg) ] [ [Win](https://github.com/anthonyalfimov/Lightpad-Block-Sandbox/releases/download/Christmas-Tree-v1.2/ChristmasTree-Win-1.2.exe) ]
+
+---
+
 Festive Christmas Tree for your Lightpad Block - [see it in action!](https://www.instagram.com/p/BsG6yCYB9jI/)
 
 Tap the Star to make it shine and play the specified note (with velocity, pitch bend and channel pressure).
