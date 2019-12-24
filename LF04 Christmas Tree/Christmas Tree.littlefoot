@@ -1,5 +1,5 @@
 /*
-<metadata   description="Festive Christmas Tree MIDI controller for your Lightpad Block"
+<metadata   description="Festive Christmas Tree MIDI controller for your Lightpad Block | v1.2"
             details="Tap the Star to make it shine and play the specified note.&#13;Tap the block anywhere else to make it snow (and toggle the specified MIDI CC to ON).&#13;Tap again to melt the snow away (and toggle MIDI CC to OFF).&#13;The Mode button controls the blinking of the lights."
             target="Lightpad"
             tags="MIDI;Fun" canEmbedModes="false">
