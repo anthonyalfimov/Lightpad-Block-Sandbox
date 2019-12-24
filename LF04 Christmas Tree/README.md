@@ -4,7 +4,7 @@
 
 ---
 
-### Download Christmas Tree 1.2: [ [Mac](https://github.com/anthonyalfimov/Lightpad-Block-Sandbox/releases/download/Christmas-Tree-v1.2/ChristmasTree-Mac-1.2.pkg) ] [ [Win](https://github.com/anthonyalfimov/Lightpad-Block-Sandbox/releases/download/Christmas-Tree-v1.2/ChristmasTree-Win-1.2.exe) ]
+### Download: [ [Christmas Tree 1.2](https://github.com/anthonyalfimov/Lightpad-Block-Sandbox/releases/tag/Christmas-Tree-v1.2) ]
 
 ---
 
@@ -14,16 +14,6 @@ Tap the Star to make it shine and play the specified note (with velocity, pitch 
 Tap the block anywhere else to make it snow (and toggle the specified MIDI CC to ON).
 Tap again to melt the snow away (and toggle MIDI CC to OFF).
 The Mode button controls the blinking of the lights.
-
----
-
-## Installation
-
-1. Make sure you have [ROLI Dashboard](https://roli.com/products/software/blocks-dashboard) installed.
-
-2. Run the installer for your operating system (on Mac you may need to right click the installer and click "Open").
-
-3. Launch ROLI Dashboard and select the app to load it into your Lightpad Block and tweak its parameters ("Edit" button).
 
 
 
