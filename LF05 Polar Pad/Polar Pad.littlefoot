@@ -1,0 +1,156 @@
+/*
+<metadata description="Polar coordinates at your fingertip."
+          details="Version: 0.1.0&#13;&#13;This pad outputs MIDI based on radial and angular position of your finger. Just one finger, don't get too excited."
+          target="Lightpad" tags="MIDI;Controller" canEmbedModes="true">
+
+    <variables>
+        <variable name="midiChannel" displayName="MIDI Channel" type="option"
+                  value="1" options="1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16"
+                  tooltip="Select the MIDI channel for sending MIDI messages." />
+        <variable name="radiusCC" displayName="Radius CC" type="int"
+                  min="0" max="127" value="16"
+                  tooltip="Select the MIDI message sent by the radial position of the touch.&#13;&#13;Range: [0-127]" />
+        <variable name="angleCC" displayName="Angle CC" type="int"
+                  min="0" max="127" value="17"
+                  tooltip="Select the MIDI message sent by the angular position of the touch.&#13;&#13;Range: [0-127]" />
+    </variables>
+</metadata>
+*/
+
+//==============================================================================
+//
+//  Polar Pad 0.1.0
+//
+//      App for ROLI Dashboard and ROLI Lightpad Block
+//
+//  Developed by Anthony Alfimov:   anthony.alfimov@gmail.com
+//
+//==============================================================================
+
+const int BG_COLOUR = 0xFF001250;
+
+float touchX, touchY;
+float touchR;
+
+const float alpha = 0.96043387;
+const float beta =  0.39782473;
+
+// alpha max plus beta min algorithm
+float fastHypotenuse (float a, float b)
+{
+    float max, min;
+    a = abs (a);
+    b = abs (b);
+
+    if (a > b)
+    {
+        max = a;
+        min = b;
+    }
+    else
+    {
+        max = b;
+        min = a;
+    }
+
+    return alpha * max + beta * min;
+}
+
+// diamond angle algorithm, returns angle in [0, 4]
+float diamondAngle (float x, float y)
+{
+    if (y >= 0)
+        return x >= 0 ? y / (x + y) : 1.0 - x / (-x + y);
+    else
+        return x < 0 ? 2.0 - y / (-x - y) : 3.0 + x / (x - y);
+}
+
+void doTouch (float x, float y)
+{
+    touchX = x * 0.5 * 15.0;
+    touchY = y * 0.5 * 15.0;
+    touchR = fastHypotenuse (touchX - 7.0, touchY - 7.0);
+
+    int radiusValue = clamp (0, 127, int (touchR / 7.0 * 128.0));
+    int angleValue = clamp (0, 127,
+                int (diamondAngle (7.0 - touchY, touchX - 7.0) / 4.0 * 128.0));
+
+    sendCC (midiChannel, radiusCC, radiusValue);
+    sendCC (midiChannel, angleCC, angleValue);
+}
+
+void resetTouch()
+{
+    touchX = 7;
+    touchY = 7;
+    touchR = 0.0;
+}
+
+void touchStart (int index, float x, float y, float z, float vz)
+{
+    if (index == 1)
+        doTouch (x, y);
+}
+
+void touchMove (int index, float x, float y, float z, float vz)
+{
+    if (index == 1)
+        doTouch (x, y);
+}
+
+void touchEnd (int index, float x, float y, float z, float vz)
+{
+    if (index == 1)
+        resetTouch();
+}
+
+void drawLine (int colour, int x0, int y0, int x1, int y1)
+{
+    int dx = x1 - x0;
+    int dy = y1 - y0;
+
+    if (dx == 0 && dy == 0)
+        return;
+
+    if (abs (dx) > abs (dy))
+    {
+        int steps = abs (dx);
+        int stepX = dx / steps;
+        float stepY = float (dy) / steps;
+
+        for (int i = 0; i < steps; ++i)
+            fillPixel (colour, x0 + i * stepX, int (y0 + 0.5 + i * stepY));
+    }
+    else
+    {
+        int steps = abs (dy);
+        int stepY = dy / steps;
+        float stepX = float (dx) / steps;
+
+        for (int j = 0; j < steps; ++j)
+            fillPixel (colour, int (x0 + 0.5 + j * stepX), y0 + j * stepY);
+    }
+}
+
+void initialise()
+{
+    resetTouch();
+}
+
+void repaint()
+{
+    clearDisplay();
+
+    blendCircle (BG_COLOUR, 7.0, 7.0, 7.0, true);
+    blendCircle (0xE0000000, 7.0, 7.0, 2.5, false);
+    blendCircle (0xE0000000, 7.0, 7.0, 5.5, false);
+    blendRect (0x10FFFFFF, 7, 0, 1, 8);
+    fillPixel (0xFFFFFF, 7, 7);
+    blendCircle (0x60FFFFFF, 7.0, 7.0, 9.0, false);
+
+    if (touchR > 0.0)
+    {
+        drawLine (0xFFFFFF, 7, 7, int (touchX), int (touchY));
+        blendCircle (0xFFFFFFFF, 7.0, 7.0, touchR, false);
+    }
+}
