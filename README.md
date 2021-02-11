@@ -4,6 +4,20 @@ Experiments with Littlefoot scripts for ROLI Lightpad Block.
 
 ---
 
+## Polar Pad
+
+![Polar Pad](https://user-images.githubusercontent.com/43878921/107666226-56652080-6c9f-11eb-8377-dfb3e34f06b0.png)
+
+---
+
+### Download: [ [Polar Pad 0.1](https://github.com/anthonyalfimov/Lightpad-Block-Sandbox/releases/tag/Polar-Pad-v0.1) ]
+
+---
+
+This app outputs MIDI based on the radial and angular position of your finger. Just one finger though, don't get too excited.
+
+---
+
 ## Christmas Tree
 
 ![Christmas Tree](LF04%20Christmas%20Tree/LF04ScreenShot01.png "Christmas Tree")
