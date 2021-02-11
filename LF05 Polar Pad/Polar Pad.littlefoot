@@ -69,12 +69,16 @@ void doTouch (float x, float y)
 {
     touchX = x * 0.5 * 15.0;
     touchY = y * 0.5 * 15.0;
-    touchR = fastHypotenuse (touchX - 7.0, touchY - 7.0);
-
-    int radiusValue = clamp (0, 127, int (touchR / 7.0 * 128.0));
+    
+    // Centre position here is nudged by 0.5 to better map the full radius range to the Lightpad bounds
+    touchR = fastHypotenuse (touchX - 7.5, touchY - 7.5);
+    // Max radius here is reduced by 0.2 to better map the full radius range to the Lightpad bounds
+    int radiusValue = clamp (0, 127, int (touchR / 6.8 * 128.0));
+    // Centre position here is nudged by 0.5 to better map angle values to the cardinal directions
     int angleValue = clamp (0, 127,
-                int (diamondAngle (7.0 - touchY, touchX - 7.0) / 4.0 * 128.0));
-
+                int (diamondAngle (7.5 - touchY, touchX - 7.5) / 4.0 * 128.0));
+    
+    log (angleValue);
     sendCC (midiChannel, radiusCC, radiusValue);
     sendCC (midiChannel, angleCC, angleValue);
 }
@@ -154,3 +158,4 @@ void repaint()
         blendCircle (0xFFFFFFFF, 7.0, 7.0, touchR, false);
     }
 }
+
