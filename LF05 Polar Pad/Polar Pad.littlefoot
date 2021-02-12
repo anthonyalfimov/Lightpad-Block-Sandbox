@@ -76,7 +76,7 @@ void doTouch (float x, float y)
     int radiusValue = clamp (0, 127, int (touchR / 6.8 * 128.0));
     // Centre position here is nudged by 0.5 to better map angle values to the cardinal directions
     int angleValue = clamp (0, 127,
-                int (diamondAngle (7.5 - touchY, touchX - 7.5) / 4.0 * 128.0));
+                int (diamondAngle (touchX - 7.5, 7.5 - touchY) / 4.0 * 128.0));
 
     log (angleValue);
     sendCC (midiChannel, radiusCC, radiusValue);
@@ -148,7 +148,7 @@ void repaint()
     blendCircle (BG_COLOUR, 7.0, 7.0, 7.0, true);
     blendCircle (0xE0000000, 7.0, 7.0, 2.5, false);
     blendCircle (0xE0000000, 7.0, 7.0, 5.5, false);
-    blendRect (0x10FFFFFF, 7, 0, 1, 8);
+    blendRect (0x10FFFFFF, 7, 7, 8, 1);
     fillPixel (0xFFFFFF, 7, 7);
     blendCircle (0x60FFFFFF, 7.0, 7.0, 9.0, false);
 
