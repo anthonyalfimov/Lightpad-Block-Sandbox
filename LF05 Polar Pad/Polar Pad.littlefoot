@@ -78,7 +78,6 @@ void doTouch (float x, float y)
     int angleValue = clamp (0, 127,
                 int (diamondAngle (touchX - 7.5, 7.5 - touchY) / 4.0 * 128.0));
 
-    log (angleValue);
     sendCC (midiChannel, radiusCC, radiusValue);
     sendCC (midiChannel, angleCC, angleValue);
 }
