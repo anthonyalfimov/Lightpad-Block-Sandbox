@@ -1,6 +1,6 @@
 /*
 <metadata description="Polar coordinates at your fingertip."
-          details="Version: 0.1&#13;&#13;This pad outputs MIDI based on the radial and angular position of your finger. Just one finger though, don't get too excited."
+          details="Version: 0.2&#13;&#13;This pad outputs MIDI based on the radial and angular position of your finger. Just one finger though, don't get too excited."
           target="Lightpad" tags="MIDI;Controller" canEmbedModes="true">
 
     <variables>
@@ -19,7 +19,7 @@
 
 //==============================================================================
 //
-//  Polar Pad 0.1
+//  Polar Pad 0.2
 //
 //      App for ROLI Dashboard and ROLI Lightpad Block
 //
