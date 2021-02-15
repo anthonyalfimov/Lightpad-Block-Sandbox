@@ -1,6 +1,6 @@
 # Polar Pad
 
-![Polar Pad](LF05%20Polar%20Pad/LF05ScreenShot01.png "Polar Pad")
+![Polar Pad](LF05ScreenShot01.png "Polar Pad")
 
 ---
 
