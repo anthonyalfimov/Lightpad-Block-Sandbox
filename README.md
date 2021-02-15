@@ -6,7 +6,7 @@ Experiments with Littlefoot scripts for ROLI Lightpad Block.
 
 ## Polar Pad
 
-![Polar Pad](https://user-images.githubusercontent.com/43878921/107702595-875b4a80-6ccb-11eb-8ff5-b6d22cf687fb.png)
+![Polar Pad](LF05%20Polar%20Pad/LF05ScreenShot01.png "Polar Pad")
 
 ---
 
