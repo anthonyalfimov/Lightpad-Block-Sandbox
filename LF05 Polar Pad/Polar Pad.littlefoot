@@ -1,25 +1,36 @@
 /*
 <metadata description="Polar coordinates at your fingertip."
-          details="Version: 0.2&#13;&#13;This pad outputs MIDI based on the radial and angular position of your finger. Just one finger though, don't get too excited."
-          target="Lightpad" tags="MIDI;Controller" canEmbedModes="true">
+          details="Version: 0.3&#13;&#13;This pad outputs MIDI based on the radial and angular position of your finger. Just one finger though, don't get too excited."
+          target="Lightpad" tags="MIDI;Controller" canEmbedModes="false">
+
+    <groups>
+        <group name="midi" displayName="MIDI"/>
+        <group name="coord" displayName="Coordinates"/>
+    </groups>
 
     <variables>
-        <variable name="midiChannel" displayName="MIDI Channel" type="option"
+        <variable name="midiChannel" displayName="MIDI Channel" type="option" group="midi"
                   value="1" options="1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16"
                   tooltip="Select the MIDI channel for sending MIDI messages." />
-        <variable name="radiusCC" displayName="Radius CC" type="int"
+        <variable name="radiusCC" displayName="Radius CC" type="int" group="midi"
                   min="0" max="127" value="16"
                   tooltip="Select the MIDI message sent by the radial position of the touch.&#13;&#13;Range: [0-127]" />
-        <variable name="angleCC" displayName="Angle CC" type="int"
+        <variable name="angleCC" displayName="Angle CC" type="int" group="midi"
                   min="0" max="127" value="17"
                   tooltip="Select the MIDI message sent by the angular position of the touch.&#13;&#13;Range: [0-127]" />
+        <variable name="angleOrigin" displayName="Angle Origin" type="option" group="coord"
+                  value="Right" options="Up;Right;Down;Left"
+                  tooltip="Select the orientation of the origin for the angular coordinate." />
+        <variable name="angleDirection" displayName="Angle Direction" type="option" group="coord"
+                  value="CCW" options="CCW;CW"
+                  tooltip="Select the direction for the angular coordinate." />
     </variables>
 </metadata>
 */
 
 //==============================================================================
 //
-//  Polar Pad 0.2
+//  Polar Pad 0.3
 //
 //      App for ROLI Dashboard and ROLI Lightpad Block
 //
@@ -27,15 +38,24 @@
 //
 //==============================================================================
 
+// UI constants
 const int BG_COLOUR = 0xFF001250;
 
+// Global touch properties
 float touchX, touchY;
 float touchR;
 
+void resetTouch()
+{
+    touchX = 7;
+    touchY = 7;
+    touchR = 0.0;
+}
+
+// Fast radius calculation: alpha max plus beta min algorithm
 const float alpha = 0.96043387;
 const float beta =  0.39782473;
 
-// alpha max plus beta min algorithm
 float fastHypotenuse (float a, float b)
 {
     float max, min;
@@ -56,13 +76,106 @@ float fastHypotenuse (float a, float b)
     return alpha * max + beta * min;
 }
 
-// diamond angle algorithm, returns angle in [0, 4]
-float diamondAngle (float x, float y)
+// Fast angle calculation: diamond angle algorithm, returns angle in [0, 4)
+float diamondAngle (float u, float v)
 {
-    if (y >= 0)
-        return x >= 0 ? y / (x + y) : 1.0 - x / (-x + y);
+    if (v >= 0)
+        return u >= 0 ? v / (u + v) : 1.0 - u / (-u + v);
     else
-        return x < 0 ? 2.0 - y / (-x - y) : 3.0 + x / (x - y);
+        return u < 0 ? 2.0 - v / (-u - v) : 3.0 + u / (u - v);
+}
+
+// Angular coordinate origin marker parameters
+int markX, markY;
+int markWidth, markHeight;
+
+// Angular coordinate calcularion parameters
+float uConst, vConst;
+int uX, uY;
+int vX, vY;
+
+// Angular coordinate origin options
+const int O_UP = 0;
+const int O_RIGHT = 1;
+const int O_DOWN = 2;
+const int O_LEFT = 3;
+
+// Angular coordinate direction options
+const int D_CCW = 0;
+const int D_CW = 1;
+
+void initialise()
+{
+    resetTouch();
+
+    int vSign = (angleDirection == D_CCW) ? 1 : -1;
+
+    // Centre position here is nudged by 0.5 to better map angle values to the cardinal directions
+
+    if (angleOrigin == O_UP)
+    {
+        // Set angle calculation parameters
+        uConst = 7.5;
+        uX = 0;
+        uY = -1;
+        vConst = 7.5 * vSign;
+        vX = -1 * vSign;
+        vY = 0;
+
+        // Set origin mark parameters
+        markX = 7;
+        markY = 0;
+        markWidth = 1;
+        markHeight = 8;
+    }
+    else if (angleOrigin == O_RIGHT)
+    {
+        // Set angle calculation parameters
+        uConst = -7.5;
+        uX = 1;
+        uY = 0;
+        vConst = 7.5 * vSign;
+        vX = 0;
+        vY = -1 * vSign;
+
+        // Set origin mark parameters
+        markX = 7;
+        markY = 7;
+        markWidth = 8;
+        markHeight = 1;
+    }
+    else if (angleOrigin == O_DOWN)
+    {
+        // Set angle calculation parameters
+        uConst = -7.5;
+        uX = 0;
+        uY = 1;
+        vConst = -7.5 * vSign;
+        vX = 1 * vSign;
+        vY = 0;
+
+        // Set origin mark parameters
+        markX = 7;
+        markY = 7;
+        markWidth = 1;
+        markHeight = 8;
+    }
+    else if (angleOrigin == O_LEFT)
+    {
+        // Set angle calculation parameters
+        uConst = 7.5;
+        uX = -1;
+        uY = 0;
+        vConst = -7.5 * vSign;
+        vX = 0;
+        vY = 1 * vSign;
+
+        // Set origin mark parameters
+        markX = 0;
+        markY = 7;
+        markWidth = 8;
+        markHeight = 1;
+    }
 }
 
 void doTouch (float x, float y)
@@ -74,19 +187,13 @@ void doTouch (float x, float y)
     touchR = fastHypotenuse (touchX - 7.5, touchY - 7.5);
     // Max radius here is reduced by 0.2 to better map the full radius range to the Lightpad bounds
     int radiusValue = clamp (0, 127, int (touchR / 6.8 * 128.0));
-    // Centre position here is nudged by 0.5 to better map angle values to the cardinal directions
-    int angleValue = clamp (0, 127,
-                int (diamondAngle (touchX - 7.5, 7.5 - touchY) / 4.0 * 128.0));
+
+    float touchAngle = diamondAngle (/*U*/ uConst + uX * touchX + uY * touchY,
+                                     /*V*/ vConst + vX * touchX + vY * touchY);
+    int angleValue = clamp (0, 127, int (touchAngle / 4.0 * 128.0));
 
     sendCC (midiChannel, radiusCC, radiusValue);
     sendCC (midiChannel, angleCC, angleValue);
-}
-
-void resetTouch()
-{
-    touchX = 7;
-    touchY = 7;
-    touchR = 0.0;
 }
 
 void touchStart (int index, float x, float y, float z, float vz)
@@ -135,30 +242,27 @@ void drawLine (int colour, int x0, int y0, int x1, int y1)
     }
 }
 
-void initialise()
-{
-    resetTouch();
-}
-
 void repaint()
 {
     clearDisplay();
 
+    // Draw backgorund
     blendCircle (BG_COLOUR, 7.0, 7.0, 7.0, true);
     blendCircle (0xE0000000, 7.0, 7.0, 2.5, false);
     blendCircle (0xE0000000, 7.0, 7.0, 5.5, false);
-    blendRect (0x10FFFFFF, 7, 7, 8, 1);
+    // Draw coordinate origin marks
+    blendRect (0x10FFFFFF, markX, markY, markWidth, markHeight);
     fillPixel (0xFFFFFF, 7, 7);
+    // Draw outer edges highlight
     blendCircle (0x60FFFFFF, 7.0, 7.0, 9.0, false);
 
+    // Draw touch mark
     if (touchR > 0.0)
     {
         drawLine (0xFFFFFF, 7, 7, int (touchX), int (touchY));
         blendCircle (0xFFFFFFFF, 7.0, 7.0, touchR, false);
     }
 }
-
-
 
 /*
 <display backgroundColour="0xFF7E7C7C" textColour ="0xFFFFFFFF">
