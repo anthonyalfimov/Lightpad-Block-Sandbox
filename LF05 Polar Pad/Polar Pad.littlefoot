@@ -20,10 +20,10 @@
                   min="0" max="127" value="17"
                   tooltip="Select the MIDI message sent by the angular position of the touch.&#13;&#13;Range: [0-127]" />
         <variable name="angleOrigin" displayName="Angle Origin Position" type="option" group="coord"
-                  value="Right" options="Up;Right;Down;Left"
+                  value="Up" options="Up;Right;Down;Left"
                   tooltip="Select the orientation of the origin for the angular coordinate." />
         <variable name="angleDirection" displayName="Angle Direction" type="option" group="coord"
-                  value="CCW" options="CCW;CW"
+                  value="CW" options="CW;CCW"
                   tooltip="Select the direction for the angular coordinate." />
         <variable name="bgColour" displayName="Pad Colour" type="colour" group="ui"
                   value="0xFF00509B"
@@ -102,8 +102,8 @@ const int O_DOWN = 2;
 const int O_LEFT = 3;
 
 // Angular coordinate direction options
-const int D_CCW = 0;
-const int D_CW = 1;
+const int D_CW = 0;
+const int D_CCW = 1;
 
 void initialise()
 {

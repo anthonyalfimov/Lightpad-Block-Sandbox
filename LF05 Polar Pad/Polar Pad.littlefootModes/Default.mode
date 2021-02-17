@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mode name="Default">
+  <variable name="midiChannel" value="1"/>
+  <variable name="radiusCC" value="16"/>
+  <variable name="angleCC" value="17"/>
+  <variable name="angleOrigin" value="Up"/>
+  <variable name="angleDirection" value="CW"/>
+  <variable name="bgColour" value="0xFF00509B"/>
+</mode>
