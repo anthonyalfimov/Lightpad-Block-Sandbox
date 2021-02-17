@@ -26,7 +26,7 @@
                   value="CCW" options="CCW;CW"
                   tooltip="Select the direction for the angular coordinate." />
         <variable name="bgColour" displayName="Pad Colour" type="colour" group="ui"
-                  value="0xFF001250"
+                  value="0xFF00509B"
                   tooltip="Set the colour of the pad." />
     </variables>
 </metadata>
@@ -107,9 +107,7 @@ const int D_CW = 1;
 
 void initialise()
 {
-    // TODO: enable gamma correction and rework the graphics
-    //  Turn gamma correction on
-    //setLocalConfig(33, 1);
+    setLocalConfig(33, 1);  //  Turn gamma correction on
 
     resetTouch();
 
@@ -253,13 +251,13 @@ void repaint()
 
     // Draw backgorund
     blendCircle (bgColour, 7.0, 7.0, 7.0, true);
-    blendCircle (0xE0000000, 7.0, 7.0, 2.5, false);
-    blendCircle (0xE0000000, 7.0, 7.0, 5.5, false);
+    blendCircle (0xA0000000, 7.0, 7.0, 2.5, false);
+    blendCircle (0xA0000000, 7.0, 7.0, 5.5, false);
     // Draw coordinate origin marks
-    blendRect (0x10FFFFFF, markX, markY, markWidth, markHeight);
+    blendRect (0x48FFFFFF, markX, markY, markWidth, markHeight);
     fillPixel (0xFFFFFF, 7, 7);
     // Draw outer edges highlight
-    blendCircle (0x60FFFFFF, 7.0, 7.0, 9.0, false);
+    blendCircle (0xC0FFFFFF, 7.0, 7.0, 9.1, false);
 
     // Draw touch mark
     if (touchR > 0.0)
