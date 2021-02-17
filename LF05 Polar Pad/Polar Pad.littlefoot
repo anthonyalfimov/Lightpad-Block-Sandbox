@@ -6,6 +6,7 @@
     <groups>
         <group name="midi" displayName="MIDI"/>
         <group name="coord" displayName="Coordinates"/>
+        <group name="ui" displayName="Appearance"/>
     </groups>
 
     <variables>
@@ -24,6 +25,9 @@
         <variable name="angleDirection" displayName="Angle Direction" type="option" group="coord"
                   value="CCW" options="CCW;CW"
                   tooltip="Select the direction for the angular coordinate." />
+        <variable name="bgColour" displayName="Pad Colour" type="colour" group="ui"
+                  value="0xFF001250"
+                  tooltip="Set the colour of the pad." />
     </variables>
 </metadata>
 */
@@ -37,9 +41,6 @@
 //  Developed by Anthony Alfimov:   anthony.alfimov@gmail.com
 //
 //==============================================================================
-
-// UI constants
-const int BG_COLOUR = 0xFF001250;
 
 // Global touch properties
 float touchX, touchY;
@@ -106,6 +107,10 @@ const int D_CW = 1;
 
 void initialise()
 {
+    // TODO: enable gamma correction and rework the graphics
+    //  Turn gamma correction on
+    //setLocalConfig(33, 1);
+
     resetTouch();
 
     int vSign = (angleDirection == D_CCW) ? 1 : -1;
@@ -247,7 +252,7 @@ void repaint()
     clearDisplay();
 
     // Draw backgorund
-    blendCircle (BG_COLOUR, 7.0, 7.0, 7.0, true);
+    blendCircle (bgColour, 7.0, 7.0, 7.0, true);
     blendCircle (0xE0000000, 7.0, 7.0, 2.5, false);
     blendCircle (0xE0000000, 7.0, 7.0, 5.5, false);
     // Draw coordinate origin marks
