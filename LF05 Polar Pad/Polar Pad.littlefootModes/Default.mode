@@ -4,6 +4,8 @@
   <variable name="midiChannel" value="1"/>
   <variable name="radiusCC" value="16"/>
   <variable name="angleCC" value="17"/>
+  <variable name="sendPressure" value="false"/>
+  <variable name="pressureCC" value="18"/>
   <variable name="angleOrigin" value="Up"/>
   <variable name="angleDirection" value="CW"/>
   <variable name="bgColour" value="0xFF00509B"/>
