@@ -1,6 +1,6 @@
 /*
 <metadata description="Polar coordinates at your fingertip."
-          details="Version: 0.3&#13;&#13;This pad outputs MIDI based on the radial and angular position of your finger. Just one finger though, don't get too excited."
+          details="Version: 0.4&#13;&#13;This pad outputs MIDI based on the radial and angular position of your finger. Just one finger though, don't get too excited."
           target="Lightpad" tags="MIDI;Controller" canEmbedModes="false">
 
     <groups>
@@ -34,7 +34,7 @@
 
 //==============================================================================
 //
-//  Polar Pad 0.3
+//  Polar Pad 0.4
 //
 //      App for ROLI Dashboard and ROLI Lightpad Block
 //
@@ -225,11 +225,19 @@ void drawLine (int colour, int x0, int y0, int x1, int y1)
     if (dx == 0 && dy == 0)
         return;
 
+    // Check if touch exceeds the circular area (with R=7.0) of the pad:
+    //  positive deltaR means that the touch exceeded pad area
+    float deltaR = touchR - 7.2;
+
     if (abs (dx) > abs (dy))
     {
         int steps = abs (dx);
         int stepX = dx / steps;
         float stepY = float (dy) / steps;
+
+        // Prevent line drawing outside of the pad area
+        if (deltaR > 0)
+            steps = steps - int (deltaR * 0.75);
 
         for (int i = 0; i < steps; ++i)
             fillPixel (colour, x0 + i * stepX, int (y0 + 0.5 + i * stepY));
@@ -239,6 +247,10 @@ void drawLine (int colour, int x0, int y0, int x1, int y1)
         int steps = abs (dy);
         int stepY = dy / steps;
         float stepX = float (dx) / steps;
+
+        // Prevent line drawing outside of the pad area
+        if (deltaR > 0)
+            steps = steps - int (deltaR * 0.75);
 
         for (int j = 0; j < steps; ++j)
             fillPixel (colour, int (x0 + 0.5 + j * stepX), y0 + j * stepY);
@@ -263,7 +275,7 @@ void repaint()
     if (touchR > 0.0)
     {
         drawLine (0xFFFFFF, 7, 7, int (touchX), int (touchY));
-        blendCircle (0xFFFFFFFF, 7.0, 7.0, touchR, false);
+        blendCircle (0xFFFFFFFF, 7.0, 7.0, clamp (0.0, 7.0, touchR), false);
     }
 }
 
