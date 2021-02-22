@@ -19,6 +19,12 @@
         <variable name="angleCC" displayName="Angle CC" type="int" group="midi"
                   min="0" max="127" value="17"
                   tooltip="Select the MIDI message sent by the angular position of the touch.&#13;&#13;Range: [0-127]" />
+        <variable name="sendPressure" displayName="Send Pressure" type="bool" group="midi"
+                  value="false"
+                  tooltip="Enable to send MIDI messages [Pressure CC] when pressure is applied to the pad." />
+        <variable name="pressureCC" displayName="Pressure CC" type="int" group="midi"
+                  min="0" max="127" value="18"
+                  tooltip="Select the MIDI message for transmitting pressure.&#13;&#13;Range: [0-127]" />
         <variable name="angleOrigin" displayName="Angle Origin Position" type="option" group="coord"
                   value="Up" options="Up;Right;Down;Left"
                   tooltip="Select the orientation of the origin for the angular coordinate." />
@@ -45,6 +51,7 @@
 // Global touch properties
 float touchX, touchY;
 float touchR;
+int touchPressure;
 
 void resetTouch()
 {
@@ -110,6 +117,11 @@ void initialise()
     setLocalConfig(33, 1);  //  Turn gamma correction on
 
     resetTouch();
+
+    if (sendPressure)       // Initialise pressure indicator
+        touchPressure = 0;
+    else
+        touchPressure = 64;
 
     int vSign = (angleDirection == D_CCW) ? 1 : -1;
 
@@ -181,7 +193,7 @@ void initialise()
     }
 }
 
-void doTouch (float x, float y)
+void doTouch (float x, float y, float z)
 {
     touchX = x * 0.5 * 15.0;
     touchY = y * 0.5 * 15.0;
@@ -197,24 +209,38 @@ void doTouch (float x, float y)
 
     sendCC (midiChannel, radiusCC, radiusValue);
     sendCC (midiChannel, angleCC, angleValue);
+
+    if (sendPressure)
+    {
+        touchPressure = clamp (0, 127, int (z * 127.0));
+        sendCC (midiChannel, pressureCC, touchPressure);
+    }
 }
 
 void touchStart (int index, float x, float y, float z, float vz)
 {
     if (index == 1)
-        doTouch (x, y);
+        doTouch (x, y, z);
 }
 
 void touchMove (int index, float x, float y, float z, float vz)
 {
     if (index == 1)
-        doTouch (x, y);
+        doTouch (x, y, z);
 }
 
 void touchEnd (int index, float x, float y, float z, float vz)
 {
     if (index == 1)
+    {
         resetTouch();
+
+        if (sendPressure)
+        {
+            touchPressure = 0;
+            sendCC (midiChannel, pressureCC, touchPressure);
+        }
+    }
 }
 
 void drawLine (int colour, int x0, int y0, int x1, int y1)
@@ -268,8 +294,9 @@ void repaint()
     // Draw coordinate origin marks
     blendRect (0x48FFFFFF, markX, markY, markWidth, markHeight);
     fillPixel (0xFFFFFF, 7, 7);
-    // Draw outer edges highlight
-    blendCircle (0xC0FFFFFF, 7.0, 7.0, 9.1, false);
+    // Draw pressure indicator (outer edges highlight)
+    int pressureColour = 0xFFFFFF | ((touchPressure + 128) << 24);
+    blendCircle (pressureColour, 7.0, 7.0, 9.1, false);
 
     // Draw touch mark
     if (touchR > 0.0)
