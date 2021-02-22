@@ -4,33 +4,34 @@
           target="Lightpad" tags="MIDI;Controller" canEmbedModes="false">
 
     <groups>
-        <group name="midi" displayName="MIDI"/>
+        <group name="general" displayName="General"/>
+        <group name="pressure" displayName="Pressure"/>
         <group name="coord" displayName="Coordinates"/>
         <group name="ui" displayName="Appearance"/>
     </groups>
 
     <variables>
-        <variable name="midiChannel" displayName="MIDI Channel" type="option" group="midi"
+        <variable name="midiChannel" displayName="MIDI Channel" type="option" group="general"
                   value="1" options="1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16"
                   tooltip="Select the MIDI channel for sending MIDI messages." />
-        <variable name="radiusCC" displayName="Radius CC" type="int" group="midi"
+        <variable name="radiusCC" displayName="Radius CC" type="int" group="general"
                   min="0" max="127" value="16"
                   tooltip="Select the MIDI message sent by the radial position of the touch.&#13;&#13;Range: [0-127]" />
-        <variable name="angleCC" displayName="Angle CC" type="int" group="midi"
+        <variable name="angleCC" displayName="Angle CC" type="int" group="general"
                   min="0" max="127" value="17"
                   tooltip="Select the MIDI message sent by the angular position of the touch.&#13;&#13;Range: [0-127]" />
-        <variable name="sendPressure" displayName="Send Pressure" type="bool" group="midi"
+        <variable name="sendPressure" displayName="Send Pressure" type="bool" group="pressure"
                   value="false"
                   tooltip="Enable to send MIDI messages [Pressure CC] when pressure is applied to the pad." />
-        <variable name="pressureCC" displayName="Pressure CC" type="int" group="midi"
+        <variable name="pressureCC" displayName="Pressure CC" type="int" group="pressure"
                   min="0" max="127" value="18"
                   tooltip="Select the MIDI message for transmitting pressure.&#13;&#13;Range: [0-127]" />
         <variable name="angleOrigin" displayName="Angle Origin Position" type="option" group="coord"
                   value="Up" options="Up;Right;Down;Left"
-                  tooltip="Select the orientation of the origin for the angular coordinate." />
+                  tooltip="Select the origin position for the angular coordinate." />
         <variable name="angleDirection" displayName="Angle Direction" type="option" group="coord"
                   value="CW" options="CW;CCW"
-                  tooltip="Select the direction for the angular coordinate." />
+                  tooltip="Select the direction for the angular coordinate:&#13;CW - clockwise;&#13;CCW - counterclockwise." />
         <variable name="bgColour" displayName="Pad Colour" type="colour" group="ui"
                   value="0xFF00509B"
                   tooltip="Set the colour of the pad." />
