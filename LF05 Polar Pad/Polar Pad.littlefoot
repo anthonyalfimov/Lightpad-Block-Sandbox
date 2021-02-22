@@ -31,7 +31,7 @@
                   tooltip="Select the origin position for the angular coordinate." />
         <variable name="angleDirection" displayName="Angle Direction" type="option" group="coord"
                   value="CW" options="CW;CCW"
-                  tooltip="Select the direction for the angular coordinate:&#13;CW - clockwise;&#13;CCW - counterclockwise." />
+                  tooltip="Select the direction for the angular coordinate:&#13;CW - clockwise,&#13;CCW - counterclockwise." />
         <variable name="bgColour" displayName="Pad Colour" type="colour" group="ui"
                   value="0xFF00509B"
                   tooltip="Set the colour of the pad." />
