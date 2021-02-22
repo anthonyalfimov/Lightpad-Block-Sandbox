@@ -28,10 +28,10 @@
                   tooltip="Select the MIDI message for transmitting pressure.&#13;&#13;Range: [0-127]" />
         <variable name="angleOrigin" displayName="Angle Origin Position" type="option" group="coord"
                   value="Up" options="Up;Right;Down;Left"
-                  tooltip="Select the origin position for the angular coordinate." />
+                  tooltip="Select the position where the angular coordinate equals to zero." />
         <variable name="angleDirection" displayName="Angle Direction" type="option" group="coord"
-                  value="CW" options="CW;CCW"
-                  tooltip="Select the direction for the angular coordinate:&#13;CW - clockwise,&#13;CCW - counterclockwise." />
+                  value="CW" options="CW;CCW;BI"
+                  tooltip="Select the direction for the angular coordinate:&#13;&#13;CW - angle value increases from 0 to 127 in the clockwise direction,&#13;&#13;CCW - angle value increases from 0 to 127 in the counterclockwise direction,&#13;&#13;BI - bidirectional: angle value reaches 127 at a position opposite to the angle origin." />
         <variable name="bgColour" displayName="Pad Colour" type="colour" group="ui"
                   value="0xFF00509B"
                   tooltip="Set the colour of the pad." />
@@ -112,6 +112,7 @@ const int O_LEFT = 3;
 // Angular coordinate direction options
 const int D_CW = 0;
 const int D_CCW = 1;
+const int D_BI = 2;
 
 void initialise()
 {
@@ -124,7 +125,7 @@ void initialise()
     else
         touchPressure = 64;
 
-    int vSign = (angleDirection == D_CCW) ? 1 : -1;
+    int vSign = (angleDirection == D_CW) ? -1 : 1;
 
     // Centre position here is nudged by 0.5 to better map angle values to the cardinal directions
 
@@ -206,6 +207,15 @@ void doTouch (float x, float y, float z)
 
     float touchAngle = diamondAngle (/*U*/ uConst + uX * touchX + uY * touchY,
                                      /*V*/ vConst + vX * touchX + vY * touchY);
+
+    if (angleDirection == D_BI)
+    {
+        if (touchAngle > 2.0)
+            touchAngle = 4.0 - touchAngle;
+
+        touchAngle = touchAngle * 2;
+    }
+
     int angleValue = clamp (0, 127, int (touchAngle / 4.0 * 128.0));
 
     sendCC (midiChannel, radiusCC, radiusValue);
