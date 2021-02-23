@@ -1,6 +1,6 @@
 /*
 <metadata description="Polar coordinates at your fingertip."
-          details="Version: 0.4&#13;&#13;This pad outputs MIDI based on the radial and angular position of your finger. Just one finger though, don't get too excited."
+          details="Version: 0.5&#13;&#13;This pad outputs MIDI based on the radial and angular position of your finger. Just one finger though, don't get too excited."
           target="Lightpad" tags="MIDI;Controller" canEmbedModes="false">
 
     <groups>
@@ -17,6 +17,9 @@
         <variable name="bgColour" displayName="Pad Colour" type="colour" group="general"
                   value="0xFF00509B"
                   tooltip="Set the colour of the pad." />
+        <variable name="enableAngle" displayName="Enable Angle" type="bool" group="angle"
+                  value="true"
+                  tooltip="Enable to send MIDI messages based on the angular position of the touch." />
         <variable name="angleCC" displayName="Angle CC" type="int" group="angle"
                   min="0" max="127" value="17"
                   tooltip="Select the MIDI message sent by the angular position of the touch.&#13;&#13;Range: [0-127]" />
@@ -26,12 +29,15 @@
         <variable name="angleDirection" displayName="Angle Direction" type="option" group="angle"
                   value="CW" options="CW;CCW;BI"
                   tooltip="Select the direction for the angular coordinate:&#13;&#13;CW - angle value increases from 0 to 127 in the clockwise direction,&#13;&#13;CCW - angle value increases from 0 to 127 in the counterclockwise direction,&#13;&#13;BI - bidirectional: angle value reaches 127 at a position opposite to the angle origin." />
+        <variable name="enableRadius" displayName="Enable Radius" type="bool" group="radius"
+                  value="true"
+                  tooltip="Enable to send MIDI messages based on the radial position of the touch." />
         <variable name="radiusCC" displayName="Radius CC" type="int" group="radius"
                   min="0" max="127" value="16"
                   tooltip="Select the MIDI message sent by the radial position of the touch.&#13;&#13;Range: [0-127]" />
-        <variable name="sendPressure" displayName="Send Pressure" type="bool" group="pressure"
+        <variable name="enablePressure" displayName="Enable Pressure" type="bool" group="pressure"
                   value="false"
-                  tooltip="Enable to send MIDI messages [Pressure CC] when pressure is applied to the pad." />
+                  tooltip="Enable to send MIDI messages when pressure is applied to the pad." />
         <variable name="pressureCC" displayName="Pressure CC" type="int" group="pressure"
                   min="0" max="127" value="18"
                   tooltip="Select the MIDI message for transmitting pressure.&#13;&#13;Range: [0-127]" />
@@ -41,7 +47,7 @@
 
 //==============================================================================
 //
-//  Polar Pad 0.4
+//  Polar Pad 0.5
 //
 //      App for ROLI Dashboard and ROLI Lightpad Block
 //
@@ -120,7 +126,7 @@ void initialise()
 
     resetTouch();
 
-    if (sendPressure)       // Initialise pressure indicator
+    if (enablePressure)       // Initialise pressure indicator
         touchPressure = 0;
     else
         touchPressure = 64;
@@ -202,26 +208,32 @@ void doTouch (float x, float y, float z)
 
     // Centre position here is nudged by 0.5 to better map the full radius range to the Lightpad bounds
     touchR = fastHypotenuse (touchX - 7.5, touchY - 7.5);
-    // Max radius here is reduced by 0.2 to better map the full radius range to the Lightpad bounds
-    int radiusValue = clamp (0, 127, int (touchR / 6.8 * 128.0));
 
-    float touchAngle = diamondAngle (/*U*/ uConst + uX * touchX + uY * touchY,
-                                     /*V*/ vConst + vX * touchX + vY * touchY);
-
-    if (angleDirection == D_BI)
+    if (enableRadius)
     {
-        if (touchAngle > 2.0)
-            touchAngle = 4.0 - touchAngle;
-
-        touchAngle = touchAngle * 2;
+        // Max radius here is reduced by 0.2 to better map the full radius range to the Lightpad bounds
+        int radiusValue = clamp (0, 127, int (touchR / 6.8 * 128.0));
+        sendCC (midiChannel, radiusCC, radiusValue);
     }
 
-    int angleValue = clamp (0, 127, int (touchAngle / 4.0 * 128.0));
+    if (enableAngle)
+    {
+        float touchAngle = diamondAngle (/*U*/ uConst + uX * touchX + uY * touchY,
+                                         /*V*/ vConst + vX * touchX + vY * touchY);
 
-    sendCC (midiChannel, radiusCC, radiusValue);
-    sendCC (midiChannel, angleCC, angleValue);
+        if (angleDirection == D_BI)
+        {
+            if (touchAngle > 2.0)
+                touchAngle = 4.0 - touchAngle;
 
-    if (sendPressure)
+            touchAngle = touchAngle * 2;
+        }
+
+        int angleValue = clamp (0, 127, int (touchAngle / 4.0 * 128.0));
+        sendCC (midiChannel, angleCC, angleValue);
+    }
+
+    if (enablePressure)
     {
         touchPressure = clamp (0, 127, int (z * 127.0));
         sendCC (midiChannel, pressureCC, touchPressure);
@@ -246,7 +258,7 @@ void touchEnd (int index, float x, float y, float z, float vz)
     {
         resetTouch();
 
-        if (sendPressure)
+        if (enablePressure)
         {
             touchPressure = 0;
             sendCC (midiChannel, pressureCC, touchPressure);
