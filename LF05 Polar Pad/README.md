@@ -4,7 +4,7 @@
 
 ---
 
-### Download: [ [Polar Pad 0.1](https://github.com/anthonyalfimov/Lightpad-Block-Sandbox/releases/tag/Polar-Pad-v0.1) ]
+### Download: [ [Polar Pad 0.4](https://github.com/anthonyalfimov/Lightpad-Block-Sandbox/releases/tag/Polar-Pad-v0.4) ]
 
 ---
 
