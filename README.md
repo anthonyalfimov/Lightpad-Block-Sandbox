@@ -10,7 +10,7 @@ Experiments with Littlefoot scripts for ROLI Lightpad Block.
 
 ---
 
-### Download: [ [Polar Pad 0.3](https://github.com/anthonyalfimov/Lightpad-Block-Sandbox/releases/tag/Polar-Pad-v0.3) ]
+### Download: [ [Polar Pad 0.4](https://github.com/anthonyalfimov/Lightpad-Block-Sandbox/releases/tag/Polar-Pad-v0.4) ]
 
 ---
 
