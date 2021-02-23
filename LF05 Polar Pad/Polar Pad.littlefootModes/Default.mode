@@ -2,11 +2,13 @@
 
 <mode name="Default">
   <variable name="midiChannel" value="1"/>
-  <variable name="radiusCC" value="16"/>
-  <variable name="angleCC" value="17"/>
-  <variable name="sendPressure" value="false"/>
-  <variable name="pressureCC" value="18"/>
+  <variable name="bgColour" value="0xFF00509B"/>
+  <variable name="enableAngle" value="true"/>
+  <variable name="angleCC" value="16"/>
   <variable name="angleOrigin" value="Up"/>
   <variable name="angleDirection" value="CW"/>
-  <variable name="bgColour" value="0xFF00509B"/>
+  <variable name="enableRadius" value="true"/>
+  <variable name="radiusCC" value="17"/>
+  <variable name="enablePressure" value="false"/>
+  <variable name="pressureCC" value="18"/>
 </mode>
