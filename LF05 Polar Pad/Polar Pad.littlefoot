@@ -5,36 +5,36 @@
 
     <groups>
         <group name="general" displayName="General"/>
+        <group name="angle" displayName="Angle"/>
+        <group name="radius" displayName="Radius"/>
         <group name="pressure" displayName="Pressure"/>
-        <group name="coord" displayName="Coordinates"/>
-        <group name="ui" displayName="Appearance"/>
     </groups>
 
     <variables>
         <variable name="midiChannel" displayName="MIDI Channel" type="option" group="general"
                   value="1" options="1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16"
                   tooltip="Select the MIDI channel for sending MIDI messages." />
-        <variable name="radiusCC" displayName="Radius CC" type="int" group="general"
-                  min="0" max="127" value="16"
-                  tooltip="Select the MIDI message sent by the radial position of the touch.&#13;&#13;Range: [0-127]" />
-        <variable name="angleCC" displayName="Angle CC" type="int" group="general"
+        <variable name="bgColour" displayName="Pad Colour" type="colour" group="general"
+                  value="0xFF00509B"
+                  tooltip="Set the colour of the pad." />
+        <variable name="angleCC" displayName="Angle CC" type="int" group="angle"
                   min="0" max="127" value="17"
                   tooltip="Select the MIDI message sent by the angular position of the touch.&#13;&#13;Range: [0-127]" />
+        <variable name="angleOrigin" displayName="Angle Origin" type="option" group="angle"
+                  value="Up" options="Up;Right;Down;Left"
+                  tooltip="Select the position where the angular coordinate equals to zero." />
+        <variable name="angleDirection" displayName="Angle Direction" type="option" group="angle"
+                  value="CW" options="CW;CCW;BI"
+                  tooltip="Select the direction for the angular coordinate:&#13;&#13;CW - angle value increases from 0 to 127 in the clockwise direction,&#13;&#13;CCW - angle value increases from 0 to 127 in the counterclockwise direction,&#13;&#13;BI - bidirectional: angle value reaches 127 at a position opposite to the angle origin." />
+        <variable name="radiusCC" displayName="Radius CC" type="int" group="radius"
+                  min="0" max="127" value="16"
+                  tooltip="Select the MIDI message sent by the radial position of the touch.&#13;&#13;Range: [0-127]" />
         <variable name="sendPressure" displayName="Send Pressure" type="bool" group="pressure"
                   value="false"
                   tooltip="Enable to send MIDI messages [Pressure CC] when pressure is applied to the pad." />
         <variable name="pressureCC" displayName="Pressure CC" type="int" group="pressure"
                   min="0" max="127" value="18"
                   tooltip="Select the MIDI message for transmitting pressure.&#13;&#13;Range: [0-127]" />
-        <variable name="angleOrigin" displayName="Angle Origin Position" type="option" group="coord"
-                  value="Up" options="Up;Right;Down;Left"
-                  tooltip="Select the position where the angular coordinate equals to zero." />
-        <variable name="angleDirection" displayName="Angle Direction" type="option" group="coord"
-                  value="CW" options="CW;CCW;BI"
-                  tooltip="Select the direction for the angular coordinate:&#13;&#13;CW - angle value increases from 0 to 127 in the clockwise direction,&#13;&#13;CCW - angle value increases from 0 to 127 in the counterclockwise direction,&#13;&#13;BI - bidirectional: angle value reaches 127 at a position opposite to the angle origin." />
-        <variable name="bgColour" displayName="Pad Colour" type="colour" group="ui"
-                  value="0xFF00509B"
-                  tooltip="Set the colour of the pad." />
     </variables>
 </metadata>
 */
