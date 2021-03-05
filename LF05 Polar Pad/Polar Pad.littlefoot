@@ -55,6 +55,10 @@
 //
 //==============================================================================
 
+// Global UI properties
+int circleColour;
+int lineColour;
+
 // Global touch properties
 float touchX, touchY;
 float touchR;
@@ -123,6 +127,9 @@ const int D_BI = 2;
 void initialise()
 {
     setLocalConfig(33, 1);  //  Turn gamma correction on
+
+    circleColour = enableRadius ? 0xFFFFFFFF : blendARGB (bgColour, 0x48FFFFFF);
+    lineColour = enableAngle ? 0xFFFFFFFF : blendARGB (bgColour, 0x48FFFFFF);
 
     resetTouch();
 
@@ -314,19 +321,24 @@ void repaint()
     blendCircle (bgColour, 7.0, 7.0, 7.0, true);
     blendCircle (0xA0000000, 7.0, 7.0, 2.5, false);
     blendCircle (0xA0000000, 7.0, 7.0, 5.5, false);
-    // Draw coordinate origin marks
-    blendRect (0x48FFFFFF, markX, markY, markWidth, markHeight);
-    fillPixel (0xFFFFFF, 7, 7);
+
     // Draw pressure indicator (outer edges highlight)
     int pressureColour = 0xFFFFFF | ((touchPressure + 128) << 24);
     blendCircle (pressureColour, 7.0, 7.0, 9.1, false);
 
+    // Draw angle = 0 mark
+    if (enableAngle)
+        blendRect (0x48FFFFFF, markX, markY, markWidth, markHeight);
+
     // Draw touch mark
     if (touchR > 0.0)
     {
-        drawLine (0xFFFFFF, 7, 7, int (touchX), int (touchY));
-        blendCircle (0xFFFFFFFF, 7.0, 7.0, clamp (0.0, 7.0, touchR), false);
+        drawLine (lineColour, 7, 7, int (touchX), int (touchY));
+        blendCircle (circleColour, 7.0, 7.0, clamp (0.0, 7.0, touchR), false);
     }
+
+    // Draw coordinate origin mark
+    fillPixel (0xFFFFFF, 7, 7);
 }
 
 /*
