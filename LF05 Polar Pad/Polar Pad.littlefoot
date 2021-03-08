@@ -107,6 +107,8 @@ float diamondAngle (float u, float v)
 // Angular coordinate origin marker parameters
 int markX, markY;
 int markWidth, markHeight;
+int biMarkX, biMarkY;
+int biMarkColour;
 
 // Angular coordinate calcularion parameters
 float uConst, vConst;
@@ -128,8 +130,12 @@ void initialise()
 {
     setLocalConfig(33, 1);  //  Turn gamma correction on
 
+    // Initialise touch marker colours
     circleColour = enableRadius ? 0xFFFFFFFF : blendARGB (bgColour, 0x48FFFFFF);
     lineColour = enableAngle ? 0xFFFFFFFF : blendARGB (bgColour, 0x48FFFFFF);
+
+    // Initialise bidirectional angle mode marker colour
+    biMarkColour = blendARGB (bgColour, 0x12FFFFFF);
 
     resetTouch();
 
@@ -152,11 +158,15 @@ void initialise()
         vX = -1 * vSign;
         vY = 0;
 
-        // Set origin mark parameters
+        // Set origin marker parameters
         markX = 7;
         markY = 0;
         markWidth = 1;
         markHeight = 8;
+
+        // Set bidirectional angle mode marker parameters
+        biMarkX = 7;
+        biMarkY = 7;
     }
     else if (angleOrigin == O_RIGHT)
     {
@@ -168,11 +178,15 @@ void initialise()
         vX = 0;
         vY = -1 * vSign;
 
-        // Set origin mark parameters
+        // Set origin marker parameters
         markX = 7;
         markY = 7;
         markWidth = 8;
         markHeight = 1;
+
+        // Set bidirectional angle mode marker parameters
+        biMarkX = 0;
+        biMarkY = 7;
     }
     else if (angleOrigin == O_DOWN)
     {
@@ -184,11 +198,15 @@ void initialise()
         vX = 1 * vSign;
         vY = 0;
 
-        // Set origin mark parameters
+        // Set origin marker parameters
         markX = 7;
         markY = 7;
         markWidth = 1;
         markHeight = 8;
+
+        // Set bidirectional angle mode marker parameters
+        biMarkX = 7;
+        biMarkY = 0;
     }
     else if (angleOrigin == O_LEFT)
     {
@@ -200,11 +218,15 @@ void initialise()
         vX = 0;
         vY = 1 * vSign;
 
-        // Set origin mark parameters
+        // Set origin marker parameters
         markX = 0;
         markY = 7;
         markWidth = 8;
         markHeight = 1;
+
+        // Set bidirectional angle mode marker parameters
+        biMarkX = 7;
+        biMarkY = 7;
     }
 }
 
@@ -326,9 +348,16 @@ void repaint()
     int pressureColour = 0xFFFFFF | ((touchPressure + 128) << 24);
     blendCircle (pressureColour, 7.0, 7.0, 9.1, false);
 
-    // Draw angle = 0 mark
+
     if (enableAngle)
+    {
+        // Draw angle = 0 marker
         blendRect (0x48FFFFFF, markX, markY, markWidth, markHeight);
+
+        // Draw angle = 127 marker for bidirectional mode
+        if (angleDirection == D_BI)
+            blendRect (biMarkColour, biMarkX, biMarkY, markWidth, markHeight);
+    }
 
     // Draw touch mark
     if (touchR > 0.0)
